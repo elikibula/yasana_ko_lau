@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Roko Admin Dashboard | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 py-8">
+  <div class="grid gap-5 md:grid-cols-[260px_1fr]">
+    {% include "partials/sidebar_admin.html" %}
+    <div class="space-y-6 min-w-0">
+      <div class="masi-card-accent rounded-md bg-lau-white p-6 shadow-sm">
+        <p class="text-sm font-semibold uppercase text-lau-earth">Roko Tui Lau / Admin Staff</p>
+        <h1 class="mt-2 font-display text-3xl text-lau-navy">Provincial Reporting Overview</h1>
+        <p class="mt-3 text-gray-700">Full administrative view of submitted village, tikina, yavusa, user, news, and export workflows.</p>
+      </div>
+
+      <div class="grid gap-4 grid-cols-1 md:grid-cols-4">
+        <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Total submissions</p><p class="mt-2 text-3xl font-bold text-lau-navy">{{ total_submissions }}</p></div>
+        <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Pending</p><p class="mt-2 text-3xl font-bold text-yellow-700">{{ pending_count }}</p></div>
+        <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Approved</p><p class="mt-2 text-3xl font-bold text-green-700">{{ approved_count }}</p></div>
+        <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Overdue</p><p class="mt-2 text-3xl font-bold text-red-700">{{ overdue_count }}</p></div>
+      </div>
+
+      <div class="grid gap-4 grid-cols-1 md:grid-cols-3">
+        <a href="{% url 'news:manage' %}" class="rounded-md bg-lau-white p-5 shadow-sm">
+          <p class="text-sm text-lau-muted">News posts</p>
+          <p class="mt-2 text-3xl font-bold text-lau-navy">{{ news_published_count }} / {{ news_draft_count }}</p>
+          <p class="text-xs text-lau-muted">Published / draft</p>
+        </a>
+        <a href="{% url 'events:manage' %}" class="rounded-md bg-lau-white p-5 shadow-sm">
+          <p class="text-sm text-lau-muted">Upcoming events</p>
+          <p class="mt-2 text-3xl font-bold text-lau-ocean">{{ upcoming_events_count }}</p>
+          <p class="text-xs text-lau-muted">Scheduled province events</p>
+        </a>
+        <a href="{% url 'documents:manage' %}" class="rounded-md bg-lau-white p-5 shadow-sm">
+          <p class="text-sm text-lau-muted">Documents</p>
+          <p class="mt-2 text-3xl font-bold text-lau-earth">{{ documents_total_count }}</p>
+          <p class="text-xs text-lau-muted">{{ documents_public_count }} public · {{ documents_restricted_count }} restricted</p>
+        </a>
+      </div>
+
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <h2 class="font-display text-2xl text-lau-navy">Official Tikina Summary</h2>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-lau-cream text-lau-navy">
+              <tr>
+                <th class="px-4 py-3">Tikina</th>
+                <th class="px-4 py-3">Koro Count</th>
+                <th class="px-4 py-3">Reports Submitted</th>
+                <th class="px-4 py-3">Pending</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-lau-cream">
+              {% for row in tikina_summary %}
+                <tr>
+                  <td class="px-4 py-3 font-semibold text-lau-navy"><a href="{% url 'tikina:detail' row.tikina.slug %}">{{ row.tikina.name }}</a></td>
+                  <td class="px-4 py-3">{{ row.tikina.koro_count }} / {{ row.tikina.official_koro_count }}</td>
+                  <td class="px-4 py-3">{{ row.reports_submitted }}</td>
+                  <td class="px-4 py-3">{{ row.pending }}</td>
+                </tr>
+              {% empty %}
+                <tr><td class="px-4 py-5 text-gray-600" colspan="4">Official Tikina data has not been loaded yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h2 class="font-display text-2xl text-lau-navy">All Koro Reports</h2>
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <select class="lau-input sm:w-44"><option>All Tikina</option></select>
+            <select class="lau-input sm:w-44"><option>All Statuses</option><option>Pending</option><option>Approved</option></select>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-lau-cream text-lau-navy">
+              <tr>
+                <th class="px-4 py-3">Koro</th>
+                <th class="px-4 py-3">Tikina</th>
+                <th class="px-4 py-3">Type</th>
+                <th class="px-4 py-3">Submitted</th>
+                <th class="px-4 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-lau-cream">
+              {% for report in koro_reports %}
+                <tr>
+                  <td class="px-4 py-3">{{ report.koro_name }}</td>
+                  <td class="px-4 py-3">{{ report.tikina.name|default:"-" }}</td>
+                  <td class="px-4 py-3">{{ report.get_report_type_display }}</td>
+                  <td class="px-4 py-3">{{ report.submitted_at|date:"d M Y" }}</td>
+                  <td class="px-4 py-3">{{ report.get_status_display }}</td>
+                </tr>
+              {% empty %}
+                <tr><td class="px-4 py-5 text-gray-600" colspan="5">No koro reports have been submitted yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid gap-5 lg:grid-cols-2">
+        <section class="rounded-md bg-lau-white p-5 shadow-sm">
+          <h2 class="font-display text-2xl text-lau-navy">All Tikina Reports</h2>
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead class="bg-lau-cream text-lau-navy"><tr><th class="px-4 py-3">Tikina</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th></tr></thead>
+              <tbody class="divide-y divide-lau-cream">
+                {% for report in tikina_reports %}
+                  <tr><td class="px-4 py-3">{{ report.tikina.name|default:"-" }}</td><td class="px-4 py-3">{{ report.get_status_display }}</td><td class="px-4 py-3">{{ report.submitted_at|date:"d M Y" }}</td></tr>
+                {% empty %}
+                  <tr><td class="px-4 py-5 text-gray-600" colspan="3">No tikina reports yet.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="rounded-md bg-lau-white p-5 shadow-sm">
+          <h2 class="font-display text-2xl text-lau-navy">All Yavusa Reports</h2>
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead class="bg-lau-cream text-lau-navy"><tr><th class="px-4 py-3">Yavusa</th><th class="px-4 py-3">Members</th><th class="px-4 py-3">Status</th></tr></thead>
+              <tbody class="divide-y divide-lau-cream">
+                {% for report in yavusa_reports %}
+                  <tr><td class="px-4 py-3">{{ report.yavusa_name }}</td><td class="px-4 py-3">{{ report.member_count }}</td><td class="px-4 py-3">{{ report.get_status_display }}</td></tr>
+                {% empty %}
+                  <tr><td class="px-4 py-5 text-gray-600" colspan="3">No yavusa reports yet.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

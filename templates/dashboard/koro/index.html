@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Turaga ni Koro Dashboard | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 py-8">
+  <div class="grid gap-5 md:grid-cols-[260px_1fr]">
+    {% include "partials/sidebar_koro.html" %}
+    <div class="space-y-6 min-w-0">
+      <div class="masi-card-accent rounded-md bg-lau-white p-6 shadow-sm">
+        <p class="text-sm font-semibold uppercase text-lau-earth">Turaga ni Koro</p>
+        <h1 class="mt-2 font-display text-3xl text-lau-navy">Malo a bula, {{ user.get_full_name|default:user.username }}</h1>
+        {% if assigned_koro %}
+          <p class="mt-3 text-gray-700">Assigned Koro: <strong>{{ assigned_koro.name }}</strong> · Tikina: <strong>{{ assigned_tikina.name }}</strong></p>
+          {% if assigned_koro.is_koro_turaga %}<p class="mt-1 text-sm font-semibold text-lau-earth">Koro Turaga of {{ assigned_tikina.name }}</p>{% endif %}
+        {% else %}
+          <p class="mt-3 text-gray-700">Koro: <strong>{{ profile.koro|default:"Not assigned" }}</strong> · Tikina: <strong>{{ profile.tikina|default:"Not assigned" }}</strong></p>
+        {% endif %}
+        <p class="mt-1 text-sm text-lau-muted">Last submission: {% if last_submission %}{{ last_submission.submitted_at|date:"d M Y" }}{% else %}No submissions yet{% endif %}</p>
+      </div>
+
+      <div class="grid gap-4 grid-cols-1 md:grid-cols-3">
+        <a href="{% url 'turani:report_create' %}" class="min-h-24 rounded-md bg-lau-ocean p-5 font-semibold text-white shadow-sm">Submit Quarterly Report</a>
+        <a href="{% url 'turani:report_create' %}" class="min-h-24 rounded-md bg-lau-earth p-5 font-semibold text-white shadow-sm">Create Population Update</a>
+        <a href="{% url 'turani:report_create' %}" class="min-h-24 rounded-md bg-lau-gold p-5 font-semibold text-lau-navy shadow-sm">Create Infrastructure Report</a>
+      </div>
+
+      {% include "dashboard/partials/latest_news_events.html" %}
+
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+          <h2 class="font-display text-2xl text-lau-navy">Create TNK report</h2>
+          <a href="{% url 'turani:report_create' %}" class="rounded bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">+ TNK ripote vou</a>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <span class="rounded-full bg-lau-cream px-4 py-1.5 text-sm font-semibold text-lau-navy">{{ tnk_total }} iVolavola</span>
+          {% for q in tnk_quarters %}
+            <span class="rounded-full border border-lau-navy/20 px-3 py-1 text-xs text-lau-muted">{{ q.quarter }} {{ q.year }}</span>
+          {% endfor %}
+        </div>
+        {% if tnk_latest %}
+          <div class="mt-4 overflow-x-auto rounded-md border border-lau-navy/10">
+            <table class="min-w-full text-sm">
+              <thead class="bg-lau-navy text-lau-cream"><tr><th class="px-4 py-2 text-left">Koro</th><th class="px-4 py-2">Kuata</th><th class="px-4 py-2">Yabaki</th><th class="px-4 py-2">Tamata</th><th class="px-4 py-2"></th></tr></thead>
+              <tbody class="divide-y divide-lau-cream">
+                {% for r in tnk_latest %}
+                  <tr><td class="px-4 py-2 font-semibold text-lau-navy">{{ r.village }}</td><td class="px-4 py-2 text-center">{{ r.quarter }}</td><td class="px-4 py-2 text-center">{{ r.year }}</td><td class="px-4 py-2 text-center">{{ r.total_population }}</td><td class="px-4 py-2"><a class="text-xs font-semibold text-lau-earth" href="{% url 'turani:report_detail' r.pk %}">Kila &rarr;</a></td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="mt-4 rounded-lg border-2 border-dashed border-lau-navy/20 p-6 text-center text-sm text-lau-muted">E sega tale na iVolavola TNK. <a href="{% url 'turani:report_create' %}" class="font-semibold text-lau-earth">Digitaka eke.</a></div>
+        {% endif %}
+      </section>
+
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <h2 class="font-display text-2xl text-lau-navy">Recent submissions</h2>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-lau-cream text-lau-navy">
+              <tr>
+                <th class="px-4 py-3">Date</th>
+                <th class="px-4 py-3">Type</th>
+                <th class="px-4 py-3">Tikina</th>
+                <th class="px-4 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-lau-cream">
+              {% for report in reports %}
+                <tr>
+                  <td class="px-4 py-3">{{ report.submitted_at|date:"d M Y" }}</td>
+                  <td class="px-4 py-3">{{ report.get_report_type_display }}</td>
+                  <td class="px-4 py-3">{{ report.tikina.name|default:"-" }}</td>
+                  <td class="px-4 py-3"><span class="rounded bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800">{{ report.get_status_display }}</span></td>
+                </tr>
+              {% empty %}
+                <tr><td class="px-4 py-5 text-gray-600" colspan="4">No reports submitted yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}

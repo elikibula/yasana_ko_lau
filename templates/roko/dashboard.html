@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard ni Roko{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-8">
+  <div class="mb-6 rounded-md bg-lau-navy p-4 text-lau-cream sm:p-6">
+    <p class="text-sm font-semibold uppercase text-lau-gold">Roko Tui</p>
+    <h1 class="mt-2 font-display text-2xl text-lau-gold sm:text-3xl">Vakadinadina ni iTukutuku ni Yasana</h1>
+    <p class="mt-2 text-sm text-lau-cream/90">Na iVolavola mai vei Turaga ni Koro, Mata ni Tikina kei na Liuliu ni Yavusa.</p>
+  </div>
+
+  <div class="mb-6 grid gap-3 sm:grid-cols-3">
+    <a class="rounded-md bg-lau-white p-4 font-semibold text-lau-navy shadow-sm" href="{% url 'turani:report_list' %}">iVolavola ni Turaga ni Koro</a>
+    <a class="rounded-md bg-lau-white p-4 font-semibold text-lau-navy shadow-sm" href="{% url 'mata_ni_tikina:report_list' %}">iVolavola ni Mata ni Tikina</a>
+    <a class="rounded-md bg-lau-white p-4 font-semibold text-lau-navy shadow-sm" href="{% url 'turaga_ni_yavusa:report_list' %}">iVolavola ni Liuliu ni Yavusa</a>
+  </div>
+
+  <div class="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div class="rounded-md bg-lau-white p-4 shadow-sm"><p class="text-xs text-lau-muted">iVolavola Taucoko</p><p class="mt-1 text-3xl font-bold text-lau-navy">{{ total_reports|intcomma }}</p></div>
+    <div class="rounded-md bg-lau-white p-4 shadow-sm"><p class="text-xs text-lau-muted">Turaga ni Koro</p><p class="mt-1 text-3xl font-bold text-lau-navy">{{ tnk_report_count|intcomma }}</p></div>
+    <div class="rounded-md bg-lau-white p-4 shadow-sm"><p class="text-xs text-lau-muted">Mata ni Tikina</p><p class="mt-1 text-3xl font-bold text-lau-navy">{{ mata_report_count|intcomma }}</p></div>
+    <div class="rounded-md bg-lau-white p-4 shadow-sm"><p class="text-xs text-lau-muted">Liuliu ni Yavusa</p><p class="mt-1 text-3xl font-bold text-lau-navy">{{ yavusa_report_count|intcomma }}</p></div>
+  </div>
+
+  <div class="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div class="rounded-md border border-lau-navy/10 bg-lau-white p-4"><p class="text-xs text-lau-muted">Lewe ni Koro</p><p class="mt-1 text-2xl font-bold text-lau-navy">{{ tnk_analysis.population|intcomma }}</p></div>
+    <div class="rounded-md border border-lau-navy/10 bg-lau-white p-4"><p class="text-xs text-lau-muted">Komiti Tiko</p><p class="mt-1 text-2xl font-bold text-lau-navy">{{ tnk_analysis.active_committees|intcomma }}</p></div>
+    <div class="rounded-md border border-lau-navy/10 bg-lau-white p-4"><p class="text-xs text-lau-muted">Leqa ni Lawa</p><p class="mt-1 text-2xl font-bold text-lau-navy">{{ tnk_analysis.offences|intcomma }}</p></div>
+    <div class="rounded-md border border-lau-navy/10 bg-lau-white p-4"><p class="text-xs text-lau-muted">IVDP kei na Leqa</p><p class="mt-1 text-2xl font-bold text-lau-navy">{{ tnk_analysis.projects|intcomma }} / {{ tnk_analysis.project_issues|intcomma }}</p></div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section class="rounded-md border border-lau-gold/40 bg-lau-cream p-4 sm:p-5">
+      <h2 class="font-display text-xl text-lau-navy">Vakadinadina ni Turaga ni Koro</h2>
+      <ul class="mt-3 space-y-2 text-sm text-lau-navy">
+        {% for note in tnk_analysis.insights %}<li class="rounded bg-lau-white px-3 py-2 shadow-sm">{{ note }}</li>{% endfor %}
+      </ul>
+    </section>
+
+    <section class="rounded-md bg-lau-white p-4 shadow-sm sm:p-5">
+      <h2 class="font-display text-xl text-lau-navy">Vakadinadina Vei Ira na Vakayagataka</h2>
+      <div class="mt-3 overflow-x-auto">
+        <table class="min-w-[34rem] text-sm">
+          <thead class="bg-lau-navy text-lau-cream"><tr><th class="px-3 py-2 text-left">Yaca</th><th class="px-3 py-2 text-center">iVolavola</th><th class="px-3 py-2 text-center">Vuvale</th><th class="px-3 py-2 text-center">Bose</th></tr></thead>
+          <tbody class="divide-y divide-lau-cream">
+            {% for user_data in tnk_user_analysis %}
+              <tr><td class="px-3 py-2 font-semibold text-lau-navy">{{ user_data.owner__first_name }} {{ user_data.owner__last_name|default:user_data.owner__username }}</td><td class="px-3 py-2 text-center">{{ user_data.reports }}</td><td class="px-3 py-2 text-center">{{ user_data.households|default:0 }}</td><td class="px-3 py-2 text-center">{{ user_data.meetings|default:0 }}</td></tr>
+            {% empty %}<tr><td colspan="4" class="px-3 py-4 text-center text-lau-muted">E sega tale ni dua na iVolavola TNK.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section class="mt-6 rounded-md bg-lau-white p-4 shadow-sm sm:p-5">
+    <h2 class="font-display text-xl text-lau-navy">iVolavola Sa Vakasoqoni Tiko</h2>
+    <div class="mt-3 overflow-x-auto">
+      <table class="min-w-[38rem] text-sm">
+        <thead class="bg-lau-navy text-lau-cream"><tr><th class="px-3 py-2 text-left">Mataqali</th><th class="px-3 py-2 text-left">Vanua</th><th class="px-3 py-2 text-left">Gauna</th><th class="px-3 py-2 text-left">Siga ni Volai</th><th class="px-3 py-2"></th></tr></thead>
+        <tbody class="divide-y divide-lau-cream">
+          {% for created, role, area, quarter, year, url_name, pk in recent_reports %}
+            <tr><td class="px-3 py-2">{{ role }}</td><td class="px-3 py-2 font-semibold text-lau-navy">{{ area }}</td><td class="px-3 py-2">{{ quarter }} {{ year }}</td><td class="px-3 py-2">{{ created|date:"d M Y" }}</td><td class="px-3 py-2"><a class="text-xs font-semibold text-lau-earth" href="{% url url_name pk %}">Kila &rarr;</a></td></tr>
+          {% empty %}<tr><td colspan="5" class="px-3 py-4 text-center text-lau-muted">E sega tale ni dua na iVolavola.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+{% endblock %}

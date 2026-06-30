@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Ivolavola TNK{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-8">
+  <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div>
+      <p class="text-sm font-semibold uppercase text-lau-earth">Turaga ni Koro</p>
+      <h1 class="font-display text-3xl text-lau-navy">A qou Ripote ni veivulatolu (Quarterly Reports)</h1>
+    </div>
+    {% if not is_roko_user %}<a href="{% url 'turani:report_create' %}" class="rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">+ Ivolavola Vou</a>{% endif %}
+  </div>
+
+  <div class="overflow-x-auto rounded-md bg-lau-white shadow-sm">
+    <table class="min-w-full text-left text-sm">
+      <thead class="bg-lau-navy text-lau-cream">
+        <tr><th class="px-4 py-3">Koro</th><th class="px-4 py-3">Jikina</th><th class="px-4 py-3">Quarter</th><th class="px-4 py-3">Yabaki</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Wiliwili ni Tamata</th><th class="px-4 py-3">IVDP</th><th class="px-4 py-3"></th></tr>
+      </thead>
+      <tbody class="divide-y divide-lau-cream">
+        {% for report in reports %}
+          <tr>
+            <td class="px-4 py-3 font-semibold text-lau-navy">{{ report.village }}</td>
+            <td class="px-4 py-3">{{ report.district }}</td>
+            <td class="px-4 py-3">{{ report.quarter }}</td>
+            <td class="px-4 py-3">{{ report.year }}</td>
+            <td class="px-4 py-3">{{ report.get_status_display }}</td>
+            <td class="px-4 py-3">{{ report.total_population|intcomma }}</td>
+            <td class="px-4 py-3">{{ report.total_ivdp_projects|intcomma }}</td>
+            <td class="px-4 py-3">
+              <a class="font-semibold text-lau-earth" href="{% url 'turani:report_detail' report.pk %}">Kila</a>
+              {% if report.status == "draft" and not is_roko_user %}
+                <span class="text-lau-muted">/</span>
+                <a class="font-semibold text-lau-earth" href="{% url 'turani:report_edit' report.pk %}">Edit</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="8" class="px-4 py-8"><div class="rounded-md border-2 border-dashed border-lau-navy/20 p-6 text-center text-lau-muted">E se bera ni dua na TNK Ripoke e sa submit taki mai.. {% if not is_roko_user %}<a class="font-semibold text-lau-earth" href="{% url 'turani:report_create' %}">Tekivu eke.</a>{% endif %}</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

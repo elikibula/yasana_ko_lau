@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Event RSVPs | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-4 py-8">
+  <a href="{% url 'events:manage' %}" class="font-semibold text-lau-earth">&larr; Events</a>
+  <h1 class="mt-3 font-display text-3xl text-lau-navy">RSVPs for {{ event.title }}</h1>
+  <div class="mt-6 rounded-md bg-lau-white p-5 shadow-sm">
+    {% for rsvp in rsvps %}
+      <div class="border-b border-lau-cream py-3"><strong>{{ rsvp.user.get_full_name|default:rsvp.user.username }}</strong> · {% if rsvp.attending %}Attending{% else %}Not attending{% endif %}</div>
+    {% empty %}
+      <p class="text-gray-700">No RSVPs yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

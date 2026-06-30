@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Ripote ni Mata ni Tikina{% endblock %}
+{% block content %}
+<section class="bg-lau-cream py-8">
+  <form method="post" class="mx-auto max-w-6xl px-4">
+    {% csrf_token %}
+    <div class="rounded-lg bg-lau-navy p-6 text-lau-cream shadow-lg">
+      <p class="text-sm font-semibold uppercase text-lau-gold">{% block report_role %}Mata ni Tikina{% endblock %}</p>
+      <h1 class="mt-2 font-display text-3xl">{% block report_heading %}Ripote ni Mata ni Tikina{% endblock %}</h1>
+    </div>
+    {% if form.non_field_errors %}<div class="mt-4 rounded-md bg-red-50 p-4 text-sm text-red-800">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="mt-6 space-y-6">
+      {% for block in form_blocks %}
+        {% if block.type == "chapter" %}
+          <div class="rounded-md bg-lau-navy px-5 py-4 text-center font-display text-xl text-lau-gold">{{ block.title }}</div>
+        {% elif block.type == "section" %}
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">{{ block.title }}</h2>
+            <div class="mt-4 grid gap-4 md:grid-cols-2">
+              {% for field in block.fields %}
+                <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}{{ field }}{% if field.help_text %}<span class="mt-1 block text-xs font-normal text-lau-muted">{{ field.help_text }}</span>{% endif %}{% for error in field.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+              {% endfor %}
+            </div>
+          </section>
+        {% elif block.type == "formset" or block.type == "matrix" %}
+          <section class="rounded-md bg-lau-white p-5 shadow-sm" data-formset="{{ block.key }}">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h2 class="font-display text-xl text-lau-navy">{{ block.title }}</h2>
+              {% if block.type == "formset" %}<button type="button" class="rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy" data-add-row="{{ block.key }}">Insert New Record</button>{% endif %}
+            </div>
+            {{ block.formset.management_form }}
+            <div class="mt-4 overflow-x-auto">
+              <div class="grid gap-4" data-rows="{{ block.key }}">
+                {% for form in block.formset.forms %}
+                  <div class="rounded-md border border-lau-navy/10 bg-lau-cream/40 p-4">
+                    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div class="grid gap-4 md:grid-cols-2">
+                      {% for field in form.visible_fields %}
+                        <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}{{ field }}{% for error in field.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <template data-empty-form="{{ block.key }}">
+              <div class="rounded-md border border-lau-navy/10 bg-lau-cream/40 p-4">
+                {% for hidden in block.formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                <div class="grid gap-4 md:grid-cols-2">
+                  {% for field in block.formset.empty_form.visible_fields %}
+                    <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}{{ field }}</label>
+                  {% endfor %}
+                </div>
+              </div>
+            </template>
+          </section>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="sticky bottom-0 mt-8 flex flex-col gap-3 border-t border-lau-navy/10 bg-lau-cream/95 px-2 py-4 sm:flex-row sm:justify-end" style="padding-bottom: env(safe-area-inset-bottom)">
+      <a href="{% block report_cancel_url %}{% url 'mata_ni_tikina:report_list' %}{% endblock %}" class="rounded-md border border-lau-navy px-5 py-3 text-center text-sm font-semibold text-lau-navy">Cancel</a>
+      <button name="action" value="save_draft" class="rounded-md border border-lau-navy bg-lau-white px-5 py-3 text-sm font-semibold text-lau-navy">Save Draft</button>
+      <button name="action" value="submit_report" class="rounded-md bg-lau-gold px-5 py-3 text-sm font-semibold text-lau-navy">Submit Report</button>
+    </div>
+  </form>
+</section>
+<script>
+document.querySelectorAll('[data-add-row]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const key = button.dataset.addRow;
+    const rows = document.querySelector(`[data-rows="${key}"]`);
+    const template = document.querySelector(`[data-empty-form="${key}"]`);
+    const total = rows.closest('[data-formset]').querySelector('input[name$="-TOTAL_FORMS"]');
+    const index = Number(total.value);
+    rows.insertAdjacentHTML('beforeend', template.innerHTML.replaceAll('__prefix__', index));
+    total.value = index + 1;
+  });
+});
+</script>
+{% endblock %}

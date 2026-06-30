@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{{ koro.name }} | Na Koro{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-8">
+  <nav class="text-sm text-lau-muted">
+    <a class="font-semibold text-lau-earth" href="{% url 'home' %}">Home</a>
+    &rarr; <a class="font-semibold text-lau-earth" href="{% url 'koro:list' %}">Koro</a>
+    &rarr; {{ koro.name }}
+  </nav>
+</section>
+
+<section class="bg-lau-navy text-lau-cream">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <span class="rounded bg-lau-gold px-3 py-1 text-sm font-semibold text-lau-navy">{{ tikina.name }}</span>
+    <h1 class="mt-4 font-display text-5xl text-lau-gold">{{ koro.name }}</h1>
+    <p class="mt-3">{% if koro.is_koro_turaga %}Koro Turaga of {{ tikina.name }}{% else %}Village of {{ tikina.name }}{% endif %}</p>
+    {% if koro.notes %}<p class="mt-1 text-sm text-lau-cream">{{ koro.notes }}</p>{% endif %}
+  </div>
+</section>
+{% include "partials/masi_divider.html" %}
+
+<section class="max-w-6xl mx-auto px-4 py-10 grid gap-6 lg:grid-cols-[1fr_320px]">
+  <article class="rounded-md bg-lau-white p-6 shadow-sm">
+    <h2 class="font-display text-3xl text-lau-navy">Koro Details</h2>
+    <dl class="mt-5 grid gap-3 text-sm md:grid-cols-2">
+      <div><dt class="font-semibold text-lau-navy">Tikina</dt><dd>{{ tikina.name }}</dd></div>
+      <div><dt class="font-semibold text-lau-navy">Status</dt><dd>{% if koro.is_koro_turaga %}Koro Turaga{% else %}Village{% endif %}</dd></div>
+      <div>
+        <dt class="font-semibold text-lau-navy">Turaga ni Koro</dt>
+        <dd>
+          {% if koro.turaga_ni_koro %}
+            {{ koro.turaga_ni_koro.user.get_full_name|default:koro.turaga_ni_koro.user.username }}
+          {% else %}
+            Not assigned
+          {% endif %}
+        </dd>
+      </div>
+      <div><dt class="font-semibold text-lau-navy">Population</dt><dd>{{ koro.population|default:"Not recorded" }}</dd></div>
+    </dl>
+    {% if koro.description %}<div class="mt-6 leading-8 text-gray-800">{{ koro.description|linebreaks }}</div>{% endif %}
+  </article>
+  <aside class="rounded-md bg-lau-white p-6 shadow-sm">
+    <h2 class="font-display text-2xl text-lau-navy">Recent Reports</h2>
+    <div class="mt-4 grid gap-3 text-sm">
+      {% for report in recent_reports %}
+        <div class="rounded border border-lau-cream p-3">
+          <strong>{{ report.get_report_type_display }}</strong>
+          <span class="block text-lau-muted">{{ report.submitted_at|date:"d M Y" }} · {{ report.get_status_display }}</span>
+        </div>
+      {% empty %}
+        <p class="text-gray-700">No recent reports for this Koro.</p>
+      {% endfor %}
+    </div>
+  </aside>
+</section>
+{% endblock %}

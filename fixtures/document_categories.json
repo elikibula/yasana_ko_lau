@@ -1,0 +1,7 @@
+[
+  {"model": "documents.documentcategory", "pk": 1, "fields": {"name": "Meeting Minutes", "slug": "minutes", "description": "Official minutes from provincial council meetings", "icon": "fa-file-alt"}},
+  {"model": "documents.documentcategory", "pk": 2, "fields": {"name": "Annual Reports", "slug": "annual-reports", "description": "Yearly provincial reports and reviews", "icon": "fa-chart-bar"}},
+  {"model": "documents.documentcategory", "pk": 3, "fields": {"name": "Forms & Applications", "slug": "forms", "description": "Official government forms for community use", "icon": "fa-clipboard"}},
+  {"model": "documents.documentcategory", "pk": 4, "fields": {"name": "Policies & Legislation", "slug": "policies", "description": "Provincial policies, bylaws, and gazette notices", "icon": "fa-gavel"}},
+  {"model": "documents.documentcategory", "pk": 5, "fields": {"name": "Development Plans", "slug": "development-plans", "description": "Infrastructure and community development plans", "icon": "fa-map"}}
+]

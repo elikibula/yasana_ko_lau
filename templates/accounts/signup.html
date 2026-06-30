@@ -1,0 +1,40 @@
+{% extends "turani/base.html" %}
+
+{% block title %}Register Turaga ni Koro{% endblock %}
+
+{% block content %}
+<div class="hero-card mb-4">
+    <h1 class="fw-bold mb-2">Create a reporting account</h1>
+    <p class="mb-0 opacity-75">Choose your membership role, register once, and your identity details will be captured automatically in each quarterly report.</p>
+</div>
+
+<form method="post" class="premium-card p-4">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row g-3">
+        {% for field in form %}
+        <div class="col-md-6 {% if field.name == 'appointment_date' %}role-specific role-tnk{% elif field.name == 'village' or field.name == 'district' or field.name == 'date_of_birth' %}role-specific role-tnk role-mata{% elif field.name == 'tokatoka' or field.name == 'mataqali' or field.name == 'yavusa' or field.name == 'vanua' %}role-specific role-yavusa{% endif %}">
+            <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <a href="{% url 'accounts:login' %}">Already registered? Sign in</a>
+        <button type="submit" class="btn btn-premium">Create account</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const roleSelect = document.getElementById('id_membership_type');
+function updateRoleFields() {
+    const map = {turaga_ni_koro:'role-tnk', mata_ni_tikina:'role-mata', turaga_ni_yavusa:'role-yavusa'};
+    document.querySelectorAll('.role-specific').forEach(el => el.classList.toggle('d-none', !el.classList.contains(map[roleSelect.value])));
+}
+roleSelect.addEventListener('change', updateRoleFields); updateRoleFields();
+</script>
+{% endblock %}

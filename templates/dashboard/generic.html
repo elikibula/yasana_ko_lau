@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto px-4 py-16">
+  <div class="rounded-md bg-lau-white p-8 shadow-sm">
+    <p class="text-sm font-semibold uppercase text-lau-earth">Access pending</p>
+    <h1 class="mt-2 font-display text-3xl text-lau-navy">Your reporting role has not been assigned</h1>
+    <p class="mt-4 text-gray-700">Please contact the Provincial Office administrator so your account can be added to the correct Django group.</p>
+    <a href="{% url 'public:contact' %}" class="mt-6 inline-flex min-h-11 items-center rounded-md bg-lau-ocean px-4 font-semibold text-white">Contact admin</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+<aside class="rounded-md bg-lau-navy p-3 text-lau-cream md:sticky md:top-4">
+  <nav class="grid gap-1 text-sm font-semibold">
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.url_name == 'tikina_dashboard' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'tikina_dashboard' %}">Tikina Overview</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:report_list' %}">View Koro Reports</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'mata_ni_tikina' and request.resolver_match.url_name == 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'mata_ni_tikina:report_create' %}">Submit Tikina Report</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'mata_ni_tikina' and request.resolver_match.url_name != 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'mata_ni_tikina:report_list' %}">My Submissions</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'documents:list' %}">Downloads</a>
+  </nav>
+</aside>

@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Turaga ni Koro Dashboard{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-lau-cream py-8">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid gap-5 md:grid-cols-[260px_1fr]">
+      {% include "partials/sidebar_koro.html" %}
+      <div class="min-w-0">
+    <div class="overflow-hidden rounded-lg bg-lau-navy shadow-xl">
+      <div class="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.5fr_1fr] lg:p-10">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wide text-lau-gold">Turaga ni Koro</p>
+          <h1 class="mt-2 text-3xl font-bold text-white sm:text-4xl">Na iTuvaki ni Koro</h1>
+          <p class="mt-4 max-w-3xl text-sm leading-6 text-white/80 sm:text-base">
+            {{ analysis.summary_text }}
+          </p>
+        </div>
+        <div class="rounded-lg bg-white/10 p-5 text-white">
+          <p class="text-sm font-semibold uppercase tracking-wide text-lau-gold">iTukutuku vou</p>
+          {% if analysis.overview.latest_report %}
+            <p class="mt-3 text-2xl font-bold">{{ analysis.overview.latest_report.village }}</p>
+            <p class="mt-1 text-sm text-white/75">
+              {{ analysis.overview.latest_report.district }} - {{ analysis.overview.latest_report.report_date|date:"d/m/Y" }}
+            </p>
+            <p class="mt-3 text-sm text-white/75">
+              {{ analysis.overview.submitted_reports|intcomma }} submitted, {{ analysis.overview.draft_reports|intcomma }} draft.
+            </p>
+          {% else %}
+            <p class="mt-3 text-sm text-white/75">No reports have been saved yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+      <div class="rounded-lg bg-lau-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">TNK Ripote</p>
+        <p class="mt-2 text-3xl font-bold text-lau-navy">{{ analysis.overview.total_reports|intcomma }}</p>
+      </div>
+      <div class="rounded-lg bg-lau-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Wiliwili ni Lewenivanua</p>
+        <p class="mt-2 text-3xl font-bold text-lau-navy">{{ analysis.population.total_population|intcomma }}</p>
+      </div>
+      <div class="rounded-lg bg-lau-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Wiliwili ni Vuvale</p>
+        <p class="mt-2 text-3xl font-bold text-lau-navy">{{ analysis.housing.total_households|intcomma }}</p>
+      </div>
+      <div class="rounded-lg bg-lau-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Cala Vakalawa</p>
+        <p class="mt-2 text-3xl font-bold text-lau-navy">{{ analysis.law.total_offences|intcomma }}</p>
+      </div>
+      <div class="rounded-lg bg-lau-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Levu ni Bisinisi</p>
+        <p class="mt-2 text-3xl font-bold text-lau-navy">{{ analysis.business.total_businesses|intcomma }}</p>
+      </div>
+      <div class="rounded-lg bg-lau-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Levu ni  IVDP</p>
+        <p class="mt-2 text-3xl font-bold text-lau-navy">{{ analysis.ivdp.total_projects|intcomma }}</p>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Summary</p>
+            <h2 class="mt-1 text-xl font-bold text-lau-navy">Nai tuvaki ena vei ya 3 na vula</h2>
+          </div>
+          <span class="rounded-full bg-lau-cream px-3 py-1 text-xs font-semibold text-lau-navy">
+            {{ analysis.overview.quarters_covered }} quarters
+          </span>
+        </div>
+        <p class="mt-4 text-sm leading-6 text-lau-muted">{{ analysis.summary_text }}</p>
+        <div class="mt-5 grid gap-3 sm:grid-cols-3">
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Villages</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.overview.villages_covered|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Districts</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.overview.districts_covered|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Drafts</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.overview.draft_reports|intcomma }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Recommendations</p>
+        <h2 class="mt-1 text-xl font-bold text-lau-navy">Na veika e gadrevi me vala!</h2>
+        <div class="mt-4 space-y-3">
+          {% for item in analysis.recommendations %}
+            <div class="rounded-md border border-lau-cream p-4">
+              <div class="flex items-start justify-between gap-3">
+                <p class="font-semibold text-lau-navy">{{ item.title }}</p>
+                <span class="rounded-full bg-lau-navy px-2.5 py-1 text-xs font-semibold text-white">{{ item.priority }}</span>
+              </div>
+              <p class="mt-2 text-sm leading-5 text-lau-muted">{{ item.detail }}</p>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No urgent recommendations from the current reports.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">6.0 Population</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Na lewe ni koro</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.population.summary }}</p>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.population.by_gender %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.gender }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No population records yet.</p>
+          {% endfor %}
+        </div>
+        {% if analysis.population.largest_age_group.label %}
+          <div class="mt-4 rounded-md bg-lau-cream p-3 text-sm text-lau-navy">
+            Largest age group: <strong>{{ analysis.population.largest_age_group.label }}</strong>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">7.0 Housing</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Vale kei na matavuvale</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.housing.summary }}</p>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Common type</p>
+            <p class="font-semibold text-lau-navy">{{ analysis.housing.most_common_house_type.label|default:"-" }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Common material</p>
+            <p class="font-semibold text-lau-navy">{{ analysis.housing.most_common_material.label|default:"-" }}</p>
+          </div>
+        </div>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.housing.by_material %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.material }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No housing count records yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">3.0 Committees</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Komiti ni koro</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.committees.summary }}</p>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Active</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.committees.existing_committees|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Need setup</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.committees.missing_committees|intcomma }}</p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Weak committees</p>
+          <div class="mt-2 flex flex-wrap gap-2">
+            {% for item in analysis.committees.weak_committees %}
+              <span class="rounded-full bg-lau-cream px-3 py-1 text-xs font-semibold text-lau-navy">{{ item.name }}</span>
+            {% empty %}
+              <span class="text-sm text-lau-muted">None flagged.</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">2.0 Law</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Lewa bibi</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.law.summary }}</p>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Reported</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.law.reported_offences|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Unreported</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.law.unreported_offences|intcomma }}</p>
+          </div>
+        </div>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.law.common_offences %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.offence_type|default:"Unspecified" }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No law records yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">11.0 Water</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Wai kei na bula savasava</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.water_sanitation.summary }}</p>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.water_sanitation.sources %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.label }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No water source records yet.</p>
+          {% endfor %}
+        </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Committee members</p>
+            <p class="font-semibold text-lau-navy">{{ analysis.water_sanitation.committee_members_count|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Waste records</p>
+            <p class="font-semibold text-lau-navy">{{ analysis.water_sanitation.waste_records|intcomma }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">12.0 Health</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Bula raraba</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.health.summary }}</p>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.health.major_conditions %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.condition_name }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No health records yet.</p>
+          {% endfor %}
+        </div>
+        <div class="mt-4 rounded-md bg-lau-cream p-3 text-sm text-lau-navy">
+          Disabilities recorded: <strong>{{ analysis.health.total_disabilities|intcomma }}</strong>
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">15.0 Crops</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Kakana kei na teitei</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.crops.summary }}</p>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.crops.major_crops %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.crop_name }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No crop records yet.</p>
+          {% endfor %}
+        </div>
+        {% if analysis.crops.food_security_notes %}
+          <p class="mt-4 text-sm leading-6 text-lau-muted">{{ analysis.crops.food_security_notes.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">14.0 IVDP</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Veivakatorocaketaki</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.ivdp.summary }}</p>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Projects</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.ivdp.total_projects|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Schedules</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.ivdp.schedule_items|intcomma }}</p>
+          </div>
+        </div>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.ivdp.status_breakdown %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.status }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No project status records yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">13.0 Business</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Bisinisi</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.business.summary }}</p>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Licensed</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.business.licensed|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Unlicensed</p>
+            <p class="text-2xl font-bold text-lau-navy">{{ analysis.business.unlicensed|intcomma }}</p>
+          </div>
+        </div>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.business.by_type %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.business_type }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No business records yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">18.0 Disaster</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Leqa tubukoso</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.disaster_climate.summary }}</p>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Readiness</p>
+            <p class="font-semibold text-lau-navy">{{ analysis.disaster_climate.readiness_label }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Materials</p>
+            <p class="font-semibold text-lau-navy">{{ analysis.disaster_climate.material_count|intcomma }}</p>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {% for item in analysis.disaster_climate.climate_change_observations %}
+            <span class="rounded-full bg-lau-cream px-3 py-1 text-xs font-semibold text-lau-navy">{{ item }}</span>
+          {% empty %}
+            <span class="text-sm text-lau-muted">No climate observations yet.</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">17.0 Culture</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">iTovo vakavanua</h2>
+        <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.culture.summary }}</p>
+        <div class="mt-4 grid grid-cols-3 gap-3">
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Confirmed</p>
+            <p class="text-xl font-bold text-lau-navy">{{ analysis.culture.confirmed_titles|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Unconfirmed</p>
+            <p class="text-xl font-bold text-lau-navy">{{ analysis.culture.unconfirmed_titles|intcomma }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-3">
+            <p class="text-xs text-lau-muted">Processing</p>
+            <p class="text-xl font-bold text-lau-navy">{{ analysis.culture.processing_titles|intcomma }}</p>
+          </div>
+        </div>
+        <div class="mt-4 space-y-2">
+          {% for row in analysis.culture.knowledge_by_area %}
+            <div class="flex justify-between gap-4 text-sm">
+              <span class="text-lau-muted">{{ row.knowledge_type }}</span>
+              <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+            </div>
+          {% empty %}
+            <p class="text-sm text-lau-muted">No culture records yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="rounded-lg bg-lau-white p-6 shadow-sm lg:col-span-2">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">4.0, 5.0, 8.0, 9.0, 10.0, 16.0</p>
+        <h2 class="mt-1 text-lg font-bold text-lau-navy">Other village indicators</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Returnees</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.returnees.total_returnees|intcomma }}</p>
+            <p class="mt-2 text-xs text-lau-muted">{{ analysis.returnees.summary }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Meetings</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.meetings.total_decisions|intcomma }}</p>
+            <p class="mt-2 text-xs text-lau-muted">{{ analysis.meetings.summary }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Visits</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.visits.total_visits|intcomma }}</p>
+            <p class="mt-2 text-xs text-lau-muted">{{ analysis.visits.summary }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Trainings</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.trainings.total_trainings|intcomma }}</p>
+            <p class="mt-2 text-xs text-lau-muted">{{ analysis.trainings.summary }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Electricity</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.electricity.sources_recorded|intcomma }}</p>
+            <p class="mt-2 text-xs text-lau-muted">{{ analysis.electricity.summary }}</p>
+          </div>
+          <div class="rounded-md bg-lau-cream p-4">
+            <p class="text-xs font-semibold text-lau-muted">Assets and savings</p>
+            <p class="mt-1 text-2xl font-bold text-lau-navy">{{ analysis.assets.total_assets|intcomma }}</p>
+            <p class="mt-2 text-xs text-lau-muted">{{ analysis.assets.summary }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 rounded-lg bg-lau-white p-6 shadow-sm">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Latest reports</p>
+          <h2 class="mt-1 text-lg font-bold text-lau-navy">Recent submissions and drafts</h2>
+        </div>
+      </div>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full divide-y divide-lau-cream text-sm">
+          <thead>
+            <tr class="text-left text-xs font-semibold uppercase tracking-wide text-lau-muted">
+              <th class="px-3 py-3">Village</th>
+              <th class="px-3 py-3">District</th>
+              <th class="px-3 py-3">Quarter</th>
+              <th class="px-3 py-3">Date</th>
+              <th class="px-3 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-lau-cream">
+            {% for report in analysis.overview.latest_reports %}
+              <tr class="text-lau-navy">
+                <td class="px-3 py-3 font-semibold">{{ report.village }}</td>
+                <td class="px-3 py-3 text-lau-muted">{{ report.district }}</td>
+                <td class="px-3 py-3 text-lau-muted">{{ report.quarter }}</td>
+                <td class="px-3 py-3 text-lau-muted">{{ report.report_date|date:"d/m/Y" }}</td>
+                <td class="px-3 py-3">
+                  <span class="rounded-full bg-lau-cream px-3 py-1 text-xs font-semibold text-lau-navy">{{ report.status }}</span>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="px-3 py-6 text-center text-lau-muted">No reports available.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

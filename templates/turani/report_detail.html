@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ report.village }} | TNK{% endblock %}
+
+{% block content %}
+<section class="bg-lau-navy text-lau-cream">
+  <div class="mx-auto max-w-6xl px-4 py-10">
+    <p class="text-sm font-semibold uppercase text-lau-gold">{{ report.quarter }} {{ report.year }}</p>
+    <h1 class="mt-2 font-display text-4xl text-lau-gold">{{ report.village }}</h1>
+    <p class="mt-3 text-sm">{{ report.district }} &middot; {{ report.province }} &middot; {{ report.get_status_display }}{% if report.submitted_at %} &middot; Submitted {{ report.submitted_at|date:"d M Y" }}{% endif %}</p>
+    {% if report.status == "draft" and not is_roko_user %}
+      <a href="{% url 'turani:report_edit' report.pk %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">Edit Draft</a>
+    {% endif %}
+  </div>
+</section>
+{% include "partials/masi_divider.html" %}
+
+<section class="mx-auto max-w-6xl px-4 py-8">
+  <div class="mb-6 grid gap-4 md:grid-cols-4">
+    {% for label, value in stats %}
+      <div class="rounded-md bg-lau-white p-5 shadow-sm">
+        <p class="text-xs uppercase text-lau-muted">{{ label }}</p>
+        <p class="mt-2 text-3xl font-bold text-lau-navy">{{ value|intcomma }}</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="space-y-6">
+    {% for title, items in sections %}
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <h2 class="font-display text-2xl text-lau-navy">{{ title }}</h2>
+        <dl class="mt-4 grid gap-4 md:grid-cols-2">
+          {% for label, value in items %}
+            <div>
+              <dt class="text-xs uppercase text-lau-muted">{{ label }}</dt>
+              <dd class="mt-1 font-semibold text-lau-navy">{{ value|default:"-" }}</dd>
+            </div>
+          {% endfor %}
+        </dl>
+      </section>
+    {% endfor %}
+
+    {% for title, rows in child_sections %}
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <h2 class="font-display text-2xl text-lau-navy">{{ title }}</h2>
+        {% if rows %}
+          <div class="mt-4 space-y-3">
+            {% for row in rows %}
+              <dl class="grid gap-3 rounded-md bg-lau-cream/60 p-4 md:grid-cols-3">
+                {% for label, value in row %}
+                  <div>
+                    <dt class="text-xs uppercase text-lau-muted">{{ label }}</dt>
+                    <dd class="mt-1 text-sm font-semibold text-lau-navy">{{ value|default:"-" }}</dd>
+                  </div>
+                {% endfor %}
+              </dl>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="mt-4 rounded-md border border-dashed border-lau-navy/20 p-4 text-sm text-lau-muted">E sega ni volai e dua na iyatu.</p>
+        {% endif %}
+      </section>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

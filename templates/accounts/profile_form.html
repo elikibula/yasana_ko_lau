@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}My Personal Details{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+
+<style>
+  .profile-page-shell {
+    position: relative;
+  }
+
+  .profile-premium-form {
+    border: 1px solid rgba(6, 59, 92, 0.08);
+    border-radius: 0 0 1.25rem 1.25rem;
+  }
+
+  .profile-section-card {
+    border: 1px solid rgba(6, 59, 92, 0.08);
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, #ffffff 0%, #fffdf7 100%);
+    padding: 1.25rem;
+    box-shadow: 0 14px 35px rgba(6, 59, 92, 0.06);
+  }
+
+  .profile-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(6, 59, 92, 0.12);
+    padding-bottom: 0.85rem;
+  }
+
+  .profile-section-heading::after {
+    content: "";
+    width: 54px;
+    height: 4px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #e1ad25, rgba(225, 173, 37, 0.25));
+  }
+
+  .profile-field {
+    position: relative;
+    border-radius: 1rem;
+    border: 1px solid rgba(6, 59, 92, 0.09);
+    background: rgba(216, 196, 196, 0.88);
+    padding: 0.95rem;
+    box-shadow: 0 6px 18px rgba(6, 59, 92, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .profile-field:hover {
+    border-color: rgba(225, 173, 37, 0.42);
+    box-shadow: 0 12px 28px rgba(6, 59, 92, 0.075);
+    transform: translateY(-1px);
+  }
+
+  .profile-field label {
+    letter-spacing: 0.01em;
+  }
+
+  .profile-premium-form input,
+  .profile-premium-form select,
+  .profile-premium-form textarea {
+    width: 100%;
+    min-height: 50px;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(6, 59, 92, 0.18);
+    background: #ffffff;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #063b5c;
+    box-shadow: inset 0 1px 1px rgba(6, 59, 92, 0.025), 0 1px 2px rgba(6, 59, 92, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .profile-premium-form textarea {
+    min-height: 130px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .profile-premium-form input:hover,
+  .profile-premium-form select:hover,
+  .profile-premium-form textarea:hover {
+    border-color: rgba(6, 59, 92, 0.38);
+    background: #fffefb;
+  }
+
+  .profile-premium-form input:focus,
+  .profile-premium-form select:focus,
+  .profile-premium-form textarea:focus {
+    outline: none;
+    border-color: #e1ad25;
+    background: #ffffff;
+    box-shadow:
+      0 0 0 4px rgba(225, 173, 37, 0.18),
+      0 10px 24px rgba(6, 59, 92, 0.09);
+  }
+
+  .profile-premium-form input::placeholder,
+  .profile-premium-form textarea::placeholder {
+    color: rgba(6, 59, 92, 0.45);
+    font-weight: 400;
+  }
+
+  .profile-premium-form select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.9rem;
+    background-image:
+      linear-gradient(45deg, transparent 50%, #063b5c 50%),
+      linear-gradient(135deg, #063b5c 50%, transparent 50%),
+      linear-gradient(to right, rgba(6, 59, 92, 0.08), rgba(6, 59, 92, 0.08));
+    background-position:
+      calc(100% - 20px) 50%,
+      calc(100% - 14px) 50%,
+      calc(100% - 42px) 50%;
+    background-size:
+      6px 6px,
+      6px 6px,
+      1px 24px;
+    background-repeat: no-repeat;
+  }
+
+  .profile-premium-form select:disabled {
+    cursor: not-allowed;
+    color: rgba(6, 59, 92, 0.45);
+    background-color: #f6f3eb;
+    border-color: rgba(6, 59, 92, 0.1);
+  }
+
+  .profile-premium-form input[type="date"] {
+    color-scheme: light;
+  }
+
+  .profile-premium-form input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.75;
+  }
+
+  .profile-error-box {
+    border-radius: 1rem;
+    border: 1px solid rgba(185, 28, 28, 0.22);
+    border-left: 5px solid #b91c1c;
+    background: linear-gradient(180deg, #fef2f2, #fff7f7);
+  }
+
+  .profile-actions {
+    border-top: 1px solid rgba(6, 59, 92, 0.12);
+  }
+
+  .profile-cancel-btn,
+  .profile-save-btn {
+    border-radius: 999px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .profile-cancel-btn:hover,
+  .profile-save-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .profile-save-btn {
+    box-shadow: 0 12px 24px rgba(225, 173, 37, 0.28);
+  }
+
+  .profile-save-btn:hover {
+    box-shadow: 0 14px 28px rgba(6, 59, 92, 0.18);
+  }
+
+  @media (max-width: 640px) {
+    .profile-section-card {
+      padding: 1rem;
+      border-radius: 1rem;
+    }
+
+    .profile-section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .profile-section-heading::after {
+      width: 72px;
+    }
+  }
+</style>
+
+<section class="profile-page-shell mx-auto max-w-5xl px-4 py-8 sm:py-12">
+  <header class="border-b-4 border-lau-gold bg-lau-navy px-6 py-7 text-lau-cream sm:px-8">
+    <p class="text-sm font-semibold uppercase text-lau-gold">{{ profile.get_membership_type_display }}</p>
+    <h1 class="mt-2 font-display text-3xl">My reporting account</h1>
+    <p class="mt-2 max-w-2xl text-sm text-lau-cream/80">
+      Keep your identity and reporting area current before submitting a quarterly report.
+    </p>
+  </header>
+
+  <form method="post" class="profile-premium-form bg-lau-white p-5 shadow-sm sm:p-8" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="profile-error-box mb-6 px-4 py-3 text-sm text-red-800">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <section class="profile-section-card">
+      <div class="profile-section-heading">
+        <h2 class="font-display text-xl text-lau-navy">Personal details</h2>
+      </div>
+
+      <div class="mt-5 grid gap-5 md:grid-cols-2">
+        {% for field in form %}
+          {% if field.name == 'first_name' or field.name == 'last_name' or field.name == 'email' %}
+            <div class="profile-field">
+              <label class="mb-1.5 block text-sm font-semibold text-lau-navy" for="{{ field.id_for_label }}">
+                {{ field.label }}
+              </label>
+              {{ field }}
+              {% for error in field.errors %}
+                <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+
+    {% if profile.membership_type == 'turaga_ni_yavusa' %}
+      <section class="profile-section-card mt-9">
+        <div class="profile-section-heading">
+          <h2 class="font-display text-xl text-lau-navy">Vanua identity</h2>
+        </div>
+
+        <div class="mt-5 grid gap-5 md:grid-cols-2">
+          {% for field in form %}
+            {% if field.name == 'tokatoka' or field.name == 'mataqali' or field.name == 'yavusa' or field.name == 'vanua' %}
+              <div class="profile-field">
+                <label class="mb-1.5 block text-sm font-semibold text-lau-navy" for="{{ field.id_for_label }}">
+                  {{ field.label }}
+                </label>
+                {{ field }}
+                {% for error in field.errors %}
+                  <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
+    {% else %}
+      <section class="profile-section-card mt-9">
+        <div class="profile-section-heading">
+          <div>
+            <h2 class="font-display text-xl text-lau-navy">Reporting area</h2>
+            <p class="mt-1 text-sm text-lau-muted">Choose your Tikina first, then select its Koro.</p>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-5 md:grid-cols-2">
+          {% for field in form %}
+            {% if field.name == 'district' or field.name == 'village' or field.name == 'date_of_birth' or field.name == 'appointment_date' %}
+              {% if field.name != 'appointment_date' or profile.membership_type == 'turaga_ni_koro' %}
+                <div class="profile-field">
+                  <label class="mb-1.5 block text-sm font-semibold text-lau-navy" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                  </label>
+                  {{ field }}
+                  {% for error in field.errors %}
+                    <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    <section class="profile-section-card mt-9">
+      <div class="profile-section-heading">
+        <h2 class="font-display text-xl text-lau-navy">Contact</h2>
+      </div>
+
+      <div class="mt-5 grid gap-5 md:grid-cols-2">
+        {% for field in form %}
+          {% if field.name == 'province' or field.name == 'phone_number' %}
+            <div class="profile-field">
+              <label class="mb-1.5 block text-sm font-semibold text-lau-navy" for="{{ field.id_for_label }}">
+                {{ field.label }}
+              </label>
+              {{ field }}
+              {% for error in field.errors %}
+                <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+
+    <div class="profile-actions mt-9 flex flex-col-reverse gap-3 pt-5 sm:flex-row sm:justify-end">
+      <a href="{% url 'accounts:dashboard' %}" class="profile-cancel-btn min-h-11 px-5 py-3 text-center text-sm font-semibold text-lau-navy hover:bg-lau-navy/5">
+        Cancel
+      </a>
+      <button type="submit" class="profile-save-btn min-h-11 bg-lau-gold px-6 py-3 text-sm font-semibold text-lau-navy hover:bg-lau-earth hover:text-white">
+        Save personal details
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (() => {
+    const tikina = document.getElementById('id_district');
+    const koro = document.getElementById('id_village');
+    if (!tikina || !koro) return;
+
+    const updateKoroOptions = () => {
+      const selectedTikina = tikina.value;
+      let selectedIsAvailable = false;
+
+      [...koro.options].forEach((option) => {
+        if (!option.value) return;
+
+        const available = Boolean(selectedTikina) && option.dataset.tikina === selectedTikina;
+        option.hidden = !available;
+        option.disabled = !available;
+
+        if (available && option.selected) selectedIsAvailable = true;
+      });
+
+      if (!selectedIsAvailable) koro.value = '';
+      koro.disabled = !selectedTikina;
+    };
+
+    tikina.addEventListener('change', updateKoroOptions);
+    updateKoroOptions();
+  })();
+</script>
+{% endblock %}
+

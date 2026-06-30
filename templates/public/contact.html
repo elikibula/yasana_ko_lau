@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-12 grid gap-8 md:grid-cols-[0.8fr_1.2fr]">
+  <div>
+    <p class="text-sm font-semibold uppercase text-lau-earth">Provincial Office</p>
+    <h1 class="font-display text-4xl text-lau-navy">Contact</h1>
+    <p class="mt-4 text-gray-700 leading-7">Send a message to the Lau Provincial Office for reporting support, public enquiries, and administration matters.</p>
+    <img src="{% static 'images/gallery/image1.jfif' %}" alt="Lau village and community landscape" class="mt-6 h-72 w-full rounded-md object-cover shadow-sm">
+  </div>
+  <form method="post" class="rounded-md bg-lau-white p-6 shadow-sm">
+    {% csrf_token %}
+    <div class="grid gap-4">
+      {% for field in form %}
+        <label class="grid gap-2 text-sm font-semibold text-lau-navy">
+          {{ field.label }}
+          {{ field }}
+          {% if field.errors %}<span class="text-sm text-red-700">{{ field.errors|join:", " }}</span>{% endif %}
+        </label>
+      {% endfor %}
+      <button class="min-h-12 rounded-md bg-lau-ocean px-5 font-semibold text-white" type="submit">Send Message</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

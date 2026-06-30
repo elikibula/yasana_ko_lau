@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ document.title }} | Official Documents{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-8">
+  <nav class="text-sm text-lau-muted">
+    <a class="text-lau-earth font-semibold" href="{% url 'documents:list' %}">Documents</a>
+    {% if document.category %} &rarr; <a class="text-lau-earth font-semibold" href="{% url 'documents:category' document.category.slug %}">{{ document.category.name }}</a>{% endif %}
+    &rarr; {{ document.title }}
+  </nav>
+
+  <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
+    <article class="rounded-md bg-lau-white p-6 shadow-sm">
+      <h1 class="font-display text-4xl text-lau-navy">{{ document.title }}</h1>
+      <p class="mt-4 leading-8 text-gray-800">{{ document.description|linebreaksbr }}</p>
+      {% if document.tags %}
+        <div class="mt-5 flex flex-wrap gap-2">
+          {% for tag in document.tags.split %}
+            <span class="rounded bg-lau-cream px-2 py-1 text-xs font-semibold text-lau-earth">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <dl class="mt-6 grid gap-3 text-sm md:grid-cols-2">
+        <div><dt class="font-semibold text-lau-navy">Uploaded by</dt><dd>{{ document.uploaded_by.get_full_name|default:document.uploaded_by.username|default:"Roko Office" }}</dd></div>
+        <div><dt class="font-semibold text-lau-navy">Date</dt><dd>{{ document.created_at|date:"d M Y" }}</dd></div>
+        <div><dt class="font-semibold text-lau-navy">Version</dt><dd>{{ document.version|default:"-" }}</dd></div>
+        <div><dt class="font-semibold text-lau-navy">Downloads</dt><dd>{{ document.download_count }}</dd></div>
+      </dl>
+    </article>
+    <aside class="rounded-md bg-lau-white p-6 shadow-sm">
+      <div class="grid h-24 w-24 place-items-center rounded-full bg-lau-navy text-xl font-bold text-lau-gold">{{ document.file_type|upper }}</div>
+      <h2 class="mt-5 font-display text-2xl text-lau-navy">Download</h2>
+      <p class="mt-2 text-sm text-lau-muted">{{ document.file.name }} · {{ document.get_file_size_display }}</p>
+      <span class="mt-4 inline-flex rounded bg-lau-cream px-2 py-1 text-xs font-semibold text-lau-earth">{{ document.get_access_level_display }}</span>
+      <a href="{% url 'documents:download' document.slug %}" class="mt-5 flex justify-center rounded-md bg-lau-gold px-4 py-3 font-semibold text-lau-navy">Download</a>
+    </aside>
+  </div>
+
+  <section class="mt-8">
+    <h2 class="font-display text-3xl text-lau-navy">Related Documents</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-3">
+      {% for related in related_documents %}
+        <a class="rounded-md bg-lau-white p-5 shadow-sm" href="{% url 'documents:detail' related.slug %}">
+          <strong class="text-lau-navy">{{ related.title }}</strong>
+          <span class="mt-1 block text-sm text-lau-muted">{{ related.get_file_type_display }}</span>
+        </a>
+      {% empty %}
+        <p class="text-gray-700">No related documents yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+{% endblock %}

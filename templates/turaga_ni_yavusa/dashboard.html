@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Turaga ni Yavusa Dashboard{% endblock %}
+{% block content %}
+<section class="bg-lau-cream py-8">
+  <div class="mx-auto max-w-7xl px-4">
+    <div class="rounded-lg bg-lau-navy p-6 text-lau-cream shadow-lg">
+      <p class="text-sm font-semibold uppercase text-lau-gold">Turaga ni Yavusa</p>
+      <h1 class="mt-2 font-display text-3xl">Yavusa Governance Dashboard</h1>
+      <p class="mt-3 text-sm text-lau-cream/80">{{ analysis.overview.summary }}</p>
+      <a href="{% url 'turaga_ni_yavusa:report_create' %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">+ Ivolavola Vou</a>
+    </div>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Reports</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.overview.total_reports|intcomma }}</p></div>
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Resident Members</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.outreach.resident_total|intcomma }}</p></div>
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Away Members</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.outreach.away_total|intcomma }}</p></div>
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Titles</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.titles.confirmed_total|intcomma }}</p></div>
+    </div>
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+      <section class="rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm lg:col-span-3">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Reference Data - sourced from Turaga ni Koro reports</p>
+        <div class="mt-4 grid gap-4 sm:grid-cols-4">
+          <div><p class="text-sm text-lau-muted">TNK Reports</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.report_count|intcomma }}</p></div>
+          <div><p class="text-sm text-lau-muted">Population</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.population_total|intcomma }}</p></div>
+          <div><p class="text-sm text-lau-muted">Households</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.household_total|intcomma }}</p></div>
+          <div><p class="text-sm text-lau-muted">Businesses</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.business_total|intcomma }}</p></div>
+        </div>
+      </section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Bosevanua</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.bosevanua.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Titles</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.titles.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Heritage</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.heritage.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Outreach</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.outreach.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Attendance</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.attendance.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Church Relations</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.church_relations.summary }}</p></section>
+    </div>
+  </div>
+</section>
+{% endblock %}

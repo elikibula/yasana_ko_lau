@@ -1,0 +1,150 @@
+{% load static %}
+<header class="sticky top-0 z-40 border-b border-lau-gold/20 bg-lau-navy/95 text-lau-cream shadow-xl shadow-lau-navy/20 backdrop-blur">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex min-h-20 items-center justify-between gap-4">
+      <a href="{% url 'public:home' %}" class="flex min-w-0 items-center gap-3 rounded-md outline-none transition hover:text-lau-gold focus-visible:ring-2 focus-visible:ring-lau-gold" aria-label="Yasana ko Lau home">
+        <img src="{% static 'images/logo_lau.png' %}" alt="Yasana ko Lau Crest" class="h-12 w-12 rounded-full bg-lau-white object-contain p-1 ring-2 ring-lau-gold/35">
+        <span class="min-w-0">
+          <span class="block font-display text-xl leading-tight text-lau-gold">Yasana ko Lau</span>
+          <span class="block text-xs text-lau-cream/70">Lau Provincial Council</span>
+        </span>
+      </a>
+
+      <nav class="hidden items-center gap-2 text-sm font-semibold md:flex" aria-label="Primary navigation">
+        <a href="{% url 'public:home' %}" class="min-h-11 rounded-full px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lau-gold {% if request.path == '/' %}bg-white/10 text-lau-gold{% endif %}">
+          Home
+        </a>
+        <a href="{% url 'public:about' %}" class="min-h-11 rounded-full px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lau-gold {% if request.path == '/about/' %}bg-white/10 text-lau-gold{% endif %}">
+          Ko Lau
+        </a>
+        <a href="{% url 'tikina:list' %}" class="min-h-11 rounded-full px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lau-gold {% if request.path == '/tikina/' %}bg-white/10 text-lau-gold{% endif %}">
+          Jikina
+        </a>
+
+        <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" @click.outside="open = false">
+          <button type="button" @click="open = !open" class="flex min-h-11 items-center gap-2 rounded-full px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lau-gold {% if '/news/' in request.path or '/events/' in request.path or '/documents/' in request.path %}bg-white/10 text-lau-gold{% endif %}" :aria-expanded="open.toString()">
+            Resources
+            <svg class="h-4 w-4 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+
+          <div x-show="open" x-transition.origin.top.right class="absolute right-0 z-50 mt-3 w-80 overflow-hidden rounded-lg border border-lau-gold/25 bg-lau-white text-lau-navy shadow-2xl shadow-lau-navy/30" style="display: none;">
+            <div class="bg-lau-navy px-5 py-4">
+              <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Resources</p>
+              <p class="mt-1 text-sm text-lau-cream/80">News, events, documents and public notices</p>
+            </div>
+            <div class="grid p-2">
+              <a href="{% url 'news:list' %}" class="group rounded-md px-4 py-3 transition hover:bg-lau-cream hover:text-lau-gold">
+                <span class="block font-bold text-lau-navy transition group-hover:text-lau-gold">Talanoa kei na Tukutuku eso</span>
+                <span class="mt-1 block text-xs text-lau-muted">A weta i tukutuku kaburaki ena loma ni Yasana</span>
+              </a>
+              <a href="{% url 'events:list' %}" class="group rounded-md px-4 py-3 transition hover:bg-lau-cream hover:text-lau-gold">
+                <span class="block font-bold text-lau-navy transition group-hover:text-lau-gold">Events</span>
+                <span class="mt-1 block text-xs text-lau-muted">Upcoming programs and gatherings</span>
+              </a>
+              <a href="{% url 'documents:list' %}" class="group rounded-md px-4 py-3 transition hover:bg-lau-cream hover:text-lau-gold">
+                <span class="block font-bold text-lau-navy transition group-hover:text-lau-gold">Documents</span>
+                <span class="mt-1 block text-xs text-lau-muted">Forms, files and public resources</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="{% url 'public:contact' %}" class="min-h-11 rounded-full px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lau-gold {% if request.path == '/contact/' %}bg-white/10 text-lau-gold{% endif %}">
+          Contact
+        </a>
+      </nav>
+
+      <div class="flex items-center gap-2" aria-label="Polotu audio controls">
+        <audio id="polotuAudio" src="{% static 'audio/Malie_Polotu.mp3' %}" preload="none" loop></audio>
+        <button id="audioPlayToggle" class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-lau-gold/60 bg-lau-gold/10 text-lg text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy focus:outline-none focus:ring-2 focus:ring-lau-gold focus:ring-offset-2 focus:ring-offset-lau-navy" type="button" aria-label="Play polotu" aria-pressed="false" title="Play polotu">
+          <span aria-hidden="true">&#9658;</span>
+        </button>
+        <button id="audioMuteToggle" class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-lau-gold/60 bg-lau-gold/10 text-lg text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy focus:outline-none focus:ring-2 focus:ring-lau-gold focus:ring-offset-2 focus:ring-offset-lau-navy" type="button" aria-label="Mute polotu" aria-pressed="false" title="Mute polotu">
+          <span aria-hidden="true">&#128266;</span>
+        </button>
+      </div>
+
+      <div class="hidden items-center gap-3 md:flex">
+        {% if user.is_authenticated %}
+          <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" @click.outside="open = false">
+            <button type="button" @click="open = !open" class="flex min-h-11 items-center gap-3 rounded-full border border-lau-gold/35 bg-white/5 px-3 py-2 text-sm font-semibold text-lau-cream shadow-sm transition hover:border-lau-gold hover:bg-lau-gold/10 hover:text-lau-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lau-gold" :aria-expanded="open.toString()">
+              <span class="grid h-8 w-8 place-items-center rounded-full bg-lau-gold text-xs font-bold uppercase text-lau-navy">
+                {{ user.first_name|default:user.username|slice:":1" }}
+              </span>
+              <span class="max-w-36 truncate">{{ user.get_full_name|default:user.username }}</span>
+              <svg class="h-4 w-4 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <div x-show="open" x-transition.origin.top.right class="absolute right-0 z-50 mt-3 w-72 overflow-hidden rounded-lg border border-lau-gold/25 bg-lau-white text-lau-navy shadow-2xl shadow-lau-navy/30" style="display: none;">
+              <div class="bg-lau-navy px-5 py-4">
+                <p class="truncate font-semibold text-lau-cream">{{ user.get_full_name|default:user.username }}</p>
+                <p class="mt-1 text-xs text-lau-gold">{{ current_role_label }}</p>
+              </div>
+              <div class="grid p-2">
+                <a href="{% url 'accounts:dashboard' %}" class="rounded-md px-4 py-3 text-sm font-semibold transition hover:bg-lau-cream hover:text-lau-gold">Dashboard</a>
+                <a href="{% url 'accounts:profile' %}" class="rounded-md px-4 py-3 text-sm font-semibold transition hover:bg-lau-cream hover:text-lau-gold">Update my profile</a>
+                <form method="post" action="{% url 'accounts:logout' %}" class="mt-2 border-t border-lau-navy/10 pt-2">
+                  {% csrf_token %}
+                  <button class="w-full rounded-md px-4 py-3 text-left text-sm font-semibold text-red-700 transition hover:bg-red-50" type="submit">Logout</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="min-h-11 rounded-full bg-lau-gold px-5 py-3 text-sm font-semibold text-lau-navy shadow-sm transition hover:bg-lau-cream hover:text-lau-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lau-gold">Login</a>
+        {% endif %}
+      </div>
+
+      <button id="navToggle" class="grid min-h-11 min-w-11 place-items-center rounded-md border border-lau-gold/50 text-2xl text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy md:hidden" aria-label="Open menu" aria-expanded="false">
+        <span aria-hidden="true">&#9776;</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobileMenu" class="fixed inset-0 z-50 hidden bg-lau-navy/95 text-lau-cream backdrop-blur md:hidden">
+  <div class="flex min-h-screen flex-col px-5 py-5">
+    <div class="flex items-center justify-between">
+      <a href="{% url 'public:home' %}" class="flex items-center gap-3 rounded-md transition hover:text-lau-gold">
+        <img src="{% static 'images/logo_lau.png' %}" alt="Yasana ko Lau Crest" class="h-12 w-12 rounded-full bg-lau-white object-contain p-1 ring-2 ring-lau-gold/35">
+        <span class="font-display text-xl text-lau-gold">Yasana ko Lau</span>
+      </a>
+      <button id="closeMobileMenu" class="grid min-h-11 min-w-11 place-items-center rounded-md border border-lau-gold/50 text-2xl text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy" aria-label="Close menu">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <nav class="mt-10 grid gap-2 text-lg font-semibold" aria-label="Mobile navigation">
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:dashboard' %}" class="min-h-12 rounded-md bg-lau-gold px-4 py-3 text-lau-navy transition hover:bg-lau-cream">Dashboard</a>
+      {% endif %}
+      <a href="{% url 'public:home' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Home</a>
+      <a href="{% url 'public:about' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Ko Lau</a>
+      <a href="{% url 'tikina:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Jikina</a>
+      <a href="{% url 'news:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">News</a>
+      <a href="{% url 'events:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Events</a>
+      <a href="{% url 'documents:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Resources</a>
+      <a href="{% url 'public:contact' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Contact</a>
+    </nav>
+
+    <div class="mt-auto grid gap-3 border-t border-lau-gold/30 pt-5">
+      {% if user.is_authenticated %}
+        <div class="rounded-lg border border-lau-gold/20 bg-white/5 px-4 py-3">
+          <p class="font-semibold">{{ user.get_full_name|default:user.username }}</p>
+          <p class="mt-1 text-xs text-lau-gold">{{ current_role_label }}</p>
+        </div>
+        <a href="{% url 'accounts:profile' %}" class="min-h-12 rounded-md border border-lau-gold/40 px-4 py-3 text-center font-semibold text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy">Update my profile</a>
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button class="min-h-12 w-full rounded-md border border-lau-gold px-4 py-3 font-semibold text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy" type="submit">Logout</button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="min-h-12 rounded-md bg-lau-gold px-4 py-3 text-center font-semibold text-lau-navy transition hover:bg-lau-cream">Login</a>
+      {% endif %}
+    </div>
+  </div>
+</div>

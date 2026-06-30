@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+
+{% block title %}Ripote ni Turaga ni Koro{% endblock %}
+
+{% block content %}
+
+<style>
+  @media (max-width: 639px) {
+    .tnk-report-form .overflow-x-auto {
+      margin-right: -1.25rem;
+      margin-left: -1.25rem;
+      padding-right: 1.25rem;
+      padding-left: 1.25rem;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tnk-report-form .overflow-x-auto table { min-width: 42rem; }
+  }
+</style>
+
+<section class="bg-lau-navy text-lau-cream">
+  <div class="mx-auto max-w-6xl px-4 py-10">
+    <h2 class="text-sm font-semibold uppercase text-lau-gold">
+      Turaga ni Koro ko - {{ profile.full_name }}
+    </h2>
+
+    <h1 class="mt-2 font-display text-2xl text-lau-gold sm:text-4xl">
+      Na Ripote ni Turaga ni Koro e {{ profile.village }} &middot; {{ profile.district }}
+    </h1>
+  </div>
+</section>
+
+{% include "partials/masi_divider.html" %}
+
+<form method="post" class="tnk-report-form mx-auto max-w-6xl px-3 py-5 sm:px-4 sm:py-8">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  <div class="space-y-6">
+
+    {% for block in form_blocks %}
+
+      {% if block.type == "chapter" %}
+        <div class="border-y-2 border-lau-gold bg-lau-navy px-4 py-3 text-center shadow-sm sm:px-5 sm:py-4">
+          <h2 class="font-display text-lg font-semibold text-lau-gold sm:text-2xl">
+            {{ block.title }}
+          </h2>
+        </div>
+      {% endif %}
+
+      {% if block.type == "label" %}
+        <div class="rounded-md border border-lau-gold/50 bg-lau-gold/10 px-4 py-3 shadow-sm">
+          <h2 class="font-display text-xl font-semibold text-lau-navy">
+            {{ block.title }}
+          </h2>
+        </div>
+      {% endif %}
+
+      {% if block.type == "section" %}
+        <fieldset class="rounded-md border border-lau-navy/10 bg-lau-white p-5 shadow-sm">
+          <legend class="px-2 font-display text-xl text-lau-navy">
+            {{ block.title }}
+          </legend>
+
+          <div class="mt-4 grid gap-4 md:grid-cols-2">
+            {% for field in block.fields %}
+              <div class="{% if field.field.widget.input_type == 'textarea' %}md:col-span-2{% endif %}">
+                <label class="mb-1 block text-sm font-semibold text-lau-navy" for="{{ field.id_for_label }}">
+                  {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% for error in field.errors %}
+                  {% if block.show_required_errors or error != "This field is required." %}
+                    <p class="mt-1 text-xs text-red-700">
+                      {{ error }}
+                    </p>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </fieldset>
+      {% endif %}
+
+
+      {% if block.type == "matrix" %}
+        <section class="rounded-md border border-lau-navy/10 bg-lau-white p-5 shadow-sm">
+          <h2 class="font-display text-xl text-lau-navy">
+            {{ block.title }}
+          </h2>
+
+          {{ block.formset.management_form }}
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm" {% if block.show_totals %}data-total-matrix="{{ block.key }}"{% endif %}>
+              <thead class="bg-lau-cream/70 text-lau-navy">
+                <tr>
+                  <th class="px-3 py-3 font-semibold">Wasewase</th>
+                  {% for label in block.column_labels %}
+                    <th class="min-w-28 px-3 py-3 font-semibold">{{ label }}</th>
+                  {% endfor %}
+                  {% if block.show_totals %}
+                    <th class="min-w-28 px-3 py-3 font-semibold">Kena Levu</th>
+                  {% endif %}
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-lau-cream">
+                {% for label, cells in block.rows %}
+                  <tr data-total-row>
+                    <th scope="row" class="whitespace-nowrap px-3 py-3 font-semibold text-lau-navy">{{ label }}</th>
+                    {% for cell in cells %}
+                      <td class="min-w-28 px-3 py-3 align-top">
+                        {% for hidden in cell.hidden_fields %}
+                          {{ hidden }}
+                        {% endfor %}
+                        {% if block.key == "population" %}
+                          {{ cell.gender.as_hidden }}
+                          {{ cell.age_group.as_hidden }}
+                        {% else %}
+                          {{ cell.house_type.as_hidden }}
+                          {{ cell.material.as_hidden }}
+                        {% endif %}
+                        {{ cell.count }}
+                        {% for error in cell.count.errors %}
+                          {% if error != "This field is required." %}
+                            <p class="mt-1 text-xs text-red-700">{{ error }}</p>
+                          {% endif %}
+                        {% endfor %}
+                      </td>
+                    {% endfor %}
+                    {% if block.show_totals %}
+                      <td class="min-w-28 px-3 py-3 align-middle font-semibold text-lau-navy" data-row-total>0</td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+                {% if block.show_totals %}
+                  <tr class="bg-lau-cream/50 font-semibold text-lau-navy" data-grand-row>
+                    <th scope="row" class="whitespace-nowrap px-3 py-3">Kena Levu</th>
+                    {% for label in block.column_labels %}
+                      <td class="min-w-28 px-3 py-3" data-column-total="{{ forloop.counter0 }}">0</td>
+                    {% endfor %}
+                    <td class="min-w-28 px-3 py-3" data-grand-total>0</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if block.type == "household" %}
+        <section class="rounded-md border border-lau-navy/10 bg-lau-white p-5 shadow-sm">
+          <h2 class="font-display text-xl text-lau-navy">
+            {{ block.title }}
+          </h2>
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead class="bg-lau-cream/70 text-lau-navy">
+                <tr>
+                  <th class="px-3 py-3 font-semibold">iTukutuku</th>
+                  <th class="min-w-40 px-3 py-3 font-semibold">Kena Levu</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row" class="px-3 py-3 text-left font-semibold text-lau-navy">{{ block.field.label }}</th>
+                  <td class="min-w-40 px-3 py-3">
+                    {{ block.field }}
+                    {% for error in block.field.errors %}
+                      {% if error != "This field is required." %}
+                        <p class="mt-1 text-xs text-red-700">{{ error }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endif %}
+
+
+      {% if block.type == "waste" %}
+        <fieldset class="rounded-md border border-lau-navy/10 bg-lau-white p-5 shadow-sm">
+          <legend class="px-2 font-display text-xl text-lau-navy">
+            {{ block.title }}
+          </legend>
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm">
+              <thead class="bg-lau-cream/70 text-lau-navy">
+                <tr>
+                  <th class="px-3 py-3 font-semibold">Taro</th>
+                  <th class="min-w-48 px-3 py-3 font-semibold">iSau</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-lau-cream">
+            {% for field in block.form %}
+                <tr>
+                  <th scope="row" class="px-3 py-3 text-left font-semibold text-lau-navy">{{ field.label }}</th>
+                  <td class="px-3 py-3">
+                    {{ field }}
+                    {% for error in field.errors %}
+                      {% if error != "This field is required." %}
+                        <p class="mt-1 text-xs text-red-700">{{ error }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+            {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
+      {% endif %}
+
+
+      {% if block.type == "formset" %}
+
+          {% if block.key == "visits" %}
+            <section class="rounded-md border border-lau-navy/10 bg-lau-white p-5 shadow-sm">
+              <div class="flex items-center justify-between gap-4">
+                <h2 class="font-display text-xl text-lau-navy">
+                  {{ block.title }}
+                </h2>
+
+                <button type="button"
+                        id="add-visit-btn"
+                        class="rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">
+                  Insert Record
+                </button>
+              </div>
+
+              {{ block.formset.management_form }}
+
+              {% if block.formset.non_form_errors %}
+                <div class="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
+                  {{ block.formset.non_form_errors }}
+                </div>
+              {% endif %}
+
+              <div id="visits-formset" class="mt-4 space-y-4">
+                {% for row in block.formset %}
+                  <div class="visit-card rounded-md border border-lau-navy/10 bg-lau-cream/40 p-4">
+                    {% for hidden in row.hidden_fields %}
+                      {{ hidden }}
+                    {% endfor %}
+
+                    <div class="grid gap-4 md:grid-cols-2">
+                      {% for field in row.visible_fields %}
+                        {% if field.name != "DELETE" %}
+                          <div class="{% if field.field.widget.input_type == 'textarea' %}md:col-span-2{% endif %}">
+                            <label class="mb-1 block text-sm font-semibold text-lau-navy" for="{{ field.id_for_label }}">
+                              {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                              {% if error != "This field is required." %}
+                                <p class="mt-1 text-xs text-red-700">
+                                  {{ error }}
+                                </p>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <template id="empty-visit-form">
+                <div class="visit-card rounded-md border border-lau-navy/10 bg-lau-cream/40 p-4">
+                  {% for hidden in block.formset.empty_form.hidden_fields %}
+                    {{ hidden }}
+                  {% endfor %}
+
+                  <div class="grid gap-4 md:grid-cols-2">
+                    {% for field in block.formset.empty_form.visible_fields %}
+                      {% if field.name != "DELETE" %}
+                        <div class="{% if field.field.widget.input_type == 'textarea' %}md:col-span-2{% endif %}">
+                          <label class="mb-1 block text-sm font-semibold text-lau-navy" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                          </label>
+
+                          {{ field }}
+
+                          {% for error in field.errors %}
+                            {% if error != "This field is required." %}
+                              <p class="mt-1 text-xs text-red-700">
+                                {{ error }}
+                              </p>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </template>
+            </section>
+
+          {% else %}
+
+
+            <section class="rounded-md border border-lau-navy/10 bg-lau-white p-5 shadow-sm">
+              <div class="flex items-center justify-between gap-4">
+                <h2 class="font-display text-xl text-lau-navy">
+                  {{ block.title }}
+                </h2>
+
+                {% if block.formset.can_delete or block.allow_add %}
+                  <button type="button"
+                          data-add-row="{{ block.formset.prefix }}"
+                          class="shrink-0 rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">
+                    Insert New Record
+                  </button>
+                {% endif %}
+              </div>
+
+              {{ block.formset.management_form }}
+
+              {% if block.formset.non_form_errors %}
+                <div class="mt-3 rounded-md bg-red-50 p-3 text-sm text-red-700">
+                  {{ block.formset.non_form_errors }}
+                </div>
+              {% endif %}
+
+              <div id="formset-{{ block.formset.prefix }}" class="mt-4 overflow-x-auto">
+                <table class="min-w-full text-left text-sm">
+                  <tbody class="divide-y divide-lau-cream">
+                    {% for row in block.formset %}
+                      <tr>
+                        {% for hidden in row.hidden_fields %}
+                          {{ hidden }}
+                        {% endfor %}
+
+                        {% if block.key == "committees" %}
+                          <td class="min-w-44 px-3 py-3 align-top font-semibold text-lau-navy">
+                            {{ row.committee_label }}
+                          </td>
+                        {% endif %}
+
+                        {% for field in row.visible_fields %}
+                          {% if field.name != "DELETE" %}
+                            <td class="min-w-44 px-3 py-3 align-top">
+                              <label class="mb-1 block text-xs font-semibold text-lau-muted" for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                              </label>
+
+                              {{ field }}
+
+                              {% for error in field.errors %}
+                                {% if error != "This field is required." %}
+                                  <p class="mt-1 text-xs text-red-700">
+                                    {{ error }}
+                                  </p>
+                                {% endif %}
+                              {% endfor %}
+                            </td>
+                          {% endif %}
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+
+              {% if block.formset.can_delete or block.allow_add %}
+                <template id="empty-form-{{ block.formset.prefix }}">
+                  <tr>
+                    {% for hidden in block.formset.empty_form.hidden_fields %}
+                      {{ hidden }}
+                    {% endfor %}
+
+                    {% for field in block.formset.empty_form.visible_fields %}
+                      {% if field.name != "DELETE" %}
+                        <td class="min-w-44 px-3 py-3 align-top">
+                          <label class="mb-1 block text-xs font-semibold text-lau-muted" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                          </label>
+
+                          {{ field }}
+                        </td>
+                      {% endif %}
+                    {% endfor %}
+                  </tr>
+                </template>
+              {% endif %}
+            </section>
+
+          {% endif %}
+
+      {% endif %}
+
+    {% endfor %}
+
+  </div>
+
+  <div class="sticky bottom-0 mt-8 flex flex-col gap-3 border-t border-lau-navy/10 bg-lau-cream/95 px-2 py-4 sm:flex-row sm:justify-end" style="padding-bottom: env(safe-area-inset-bottom)">
+    <a href="{% url 'turani:report_list' %}" class="min-h-11 rounded-md border border-lau-navy px-4 py-2 text-center text-sm font-semibold text-lau-navy">
+      Lesu
+    </a>
+
+    <button type="submit" name="action" value="save_draft" class="min-h-11 rounded-md border border-lau-navy bg-lau-white px-5 py-2 text-sm font-semibold text-lau-navy">
+      Save Draft
+    </button>
+
+    <button type="submit" name="action" value="submit_report" class="min-h-11 rounded-md bg-lau-gold px-5 py-2 text-sm font-semibold text-lau-navy">
+      Submit Report
+    </button>
+  </div>
+</form>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const addButton = document.getElementById("add-visit-btn");
+    const formsetContainer = document.getElementById("visits-formset");
+    const emptyFormTemplate = document.getElementById("empty-visit-form");
+    const totalFormsInput = document.getElementById("id_visits-TOTAL_FORMS");
+
+    if (!addButton || !formsetContainer || !emptyFormTemplate || !totalFormsInput) {
+      return;
+    }
+
+    addButton.addEventListener("click", function () {
+      const formIndex = parseInt(totalFormsInput.value, 10);
+      const newFormHtml = emptyFormTemplate.innerHTML.replace(/__prefix__/g, formIndex);
+
+      formsetContainer.insertAdjacentHTML("beforeend", newFormHtml);
+      totalFormsInput.value = formIndex + 1;
+    });
+
+    document.querySelectorAll("[data-add-row]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        const prefix = button.dataset.addRow;
+        const formsetContainer = document.getElementById("formset-" + prefix);
+        const emptyFormTemplate = document.getElementById("empty-form-" + prefix);
+        const totalFormsInput = document.getElementById("id_" + prefix + "-TOTAL_FORMS");
+
+        if (!formsetContainer || !emptyFormTemplate || !totalFormsInput) {
+          return;
+        }
+
+        const formIndex = parseInt(totalFormsInput.value, 10);
+        const newFormHtml = emptyFormTemplate.innerHTML.replace(/__prefix__/g, formIndex);
+        const tableBody = formsetContainer.querySelector("tbody");
+
+        if (!tableBody) {
+          return;
+        }
+
+        tableBody.insertAdjacentHTML("beforeend", newFormHtml);
+        totalFormsInput.value = formIndex + 1;
+      });
+    });
+
+    function updateMatrixTotals(table) {
+      const columnTotals = [];
+      let grandTotal = 0;
+
+      table.querySelectorAll("tr[data-total-row]").forEach(function (row) {
+        let rowTotal = 0;
+
+        row.querySelectorAll('input[name$="-count"]').forEach(function (input, columnIndex) {
+          const value = parseInt(input.value, 10) || 0;
+          rowTotal += value;
+          columnTotals[columnIndex] = (columnTotals[columnIndex] || 0) + value;
+        });
+
+        const rowTotalCell = row.querySelector("[data-row-total]");
+        if (rowTotalCell) {
+          rowTotalCell.textContent = rowTotal;
+        }
+
+        grandTotal += rowTotal;
+      });
+
+      table.querySelectorAll("[data-column-total]").forEach(function (cell) {
+        const columnIndex = parseInt(cell.dataset.columnTotal, 10);
+        cell.textContent = columnTotals[columnIndex] || 0;
+      });
+
+      const grandTotalCell = table.querySelector("[data-grand-total]");
+      if (grandTotalCell) {
+        grandTotalCell.textContent = grandTotal;
+      }
+    }
+
+    document.querySelectorAll("[data-total-matrix]").forEach(function (table) {
+      table.addEventListener("input", function (event) {
+        if (event.target.matches('input[name$="-count"]')) {
+          updateMatrixTotals(table);
+        }
+      });
+      updateMatrixTotals(table);
+    });
+  });
+</script>
+
+{% endblock %}

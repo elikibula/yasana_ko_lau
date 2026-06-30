@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Mata ni Tikina Dashboard{% endblock %}
+{% block content %}
+<section class="bg-lau-cream py-8">
+  <div class="mx-auto max-w-7xl px-4">
+    <div class="rounded-lg bg-lau-navy p-6 text-lau-cream shadow-lg">
+      <p class="text-sm font-semibold uppercase text-lau-gold">Mata ni Tikina</p>
+      <h1 class="mt-2 font-display text-3xl">Tikina Governance Dashboard</h1>
+      <p class="mt-3 text-sm text-lau-cream/80">{{ analysis.overview.summary }}</p>
+      <a href="{% url 'mata_ni_tikina:report_create' %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">+ Ivolavola Vou</a>
+    </div>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Reports</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.overview.total_reports|intcomma }}</p></div>
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Tikina</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.overview.tikinas_covered|intcomma }}</p></div>
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Soli Collected</p><p class="text-3xl font-bold text-lau-navy">${{ analysis.finance.soli_collected|floatformat:2 }}</p></div>
+      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Village Visits</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.village_visits.total_visits|intcomma }}</p></div>
+    </div>
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+      <section class="rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm lg:col-span-3">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Reference Data - sourced from Turaga ni Koro reports</p>
+        <div class="mt-4 grid gap-4 sm:grid-cols-4">
+          <div><p class="text-sm text-lau-muted">TNK Reports</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.report_count|intcomma }}</p></div>
+          <div><p class="text-sm text-lau-muted">Population</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.population_total|intcomma }}</p></div>
+          <div><p class="text-sm text-lau-muted">Households</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.household_total|intcomma }}</p></div>
+          <div><p class="text-sm text-lau-muted">Businesses</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.business_total|intcomma }}</p></div>
+        </div>
+      </section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Coordination Status</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.coordination.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Social Indicators</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.social_indicators.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Income Sources</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.income.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Infrastructure</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.infrastructure.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Government Partnership</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.government_partnership.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">NGO Partnership</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.ngo_partnership.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Financial/Soli</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.finance.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Farmland</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.farmland.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Representative Participation</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.representation.summary }}</p></section>
+      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Village Visits</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.village_visits.summary }}</p></section>
+    </div>
+  </div>
+</section>
+{% endblock %}

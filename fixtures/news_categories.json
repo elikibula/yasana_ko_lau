@@ -1,0 +1,7 @@
+[
+  {"model": "news.newscategory", "pk": 1, "fields": {"name": "Announcements", "slug": "announcements"}},
+  {"model": "news.newscategory", "pk": 2, "fields": {"name": "Provincial News", "slug": "provincial-news"}},
+  {"model": "news.newscategory", "pk": 3, "fields": {"name": "Community", "slug": "community"}},
+  {"model": "news.newscategory", "pk": 4, "fields": {"name": "Culture & Heritage", "slug": "culture-heritage"}},
+  {"model": "news.newscategory", "pk": 5, "fields": {"name": "Development", "slug": "development"}}
+]

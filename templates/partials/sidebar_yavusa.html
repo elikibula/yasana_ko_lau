@@ -1,0 +1,8 @@
+<aside class="rounded-md bg-lau-navy p-3 text-lau-cream md:sticky md:top-4">
+  <nav class="grid gap-1 text-sm font-semibold">
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'yavusa' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'yavusa:dashboard' %}">Yavusa Overview</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'accounts' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'accounts:profile' %}">Yavusa Profile</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turaga_ni_yavusa' and request.resolver_match.url_name == 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turaga_ni_yavusa:report_create' %}">Submit Yavusa Report</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turaga_ni_yavusa' and request.resolver_match.url_name != 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turaga_ni_yavusa:report_list' %}">My Submissions</a>
+  </nav>
+</aside>

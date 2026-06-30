@@ -1,0 +1,14 @@
+<aside class="rounded-md bg-lau-navy p-3 text-lau-cream md:sticky md:top-4">
+  <nav class="grid gap-1 text-sm font-semibold">
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'admin_panel' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'admin_panel:dashboard' %}">Overview</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'turani:report_list' %}">All Koro Reports</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'mata_ni_tikina:report_list' %}">All Tikina Reports</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'turaga_ni_yavusa:report_list' %}">All Yavusa Reports</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'admin:auth_user_changelist' %}">User Management</a>
+    <div class="px-3 pb-1 pt-4 text-xs uppercase tracking-wide text-lau-gold">Content Management</div>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'news:manage' %}">News Posts</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'events:manage' %}">Events</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'documents:manage' %}">Documents</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'admin:index' %}">System Settings</a>
+  </nav>
+</aside>

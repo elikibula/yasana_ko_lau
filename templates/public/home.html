@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Yasana ko Lau | Lau Provincial Council{% endblock %}
+
+{% block content %}
+<section class="relative min-h-[520px] overflow-hidden bg-lau-navy text-lau-white">
+  <video class="absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline poster="{% static 'images/homepagecover.png' %}" aria-label="Yatu Lau ocean and island scenery">
+    <source src="{% static 'videos/yatulau.mp4' %}" type="video/mp4">
+  </video>
+  <div class="relative max-w-6xl mx-auto px-4 py-20 md:py-28">
+    <div class="max-w-3xl [text-shadow:0_2px_10px_rgba(0,0,0,0.55)]">
+      <p class="text-sm font-semibold uppercase text-2xl">Lau Provincial Council</p>
+      <h1 class="mt-4 font-display text-4xl md:text-6xl leading-tight text-lau-gold">Sa malo a bula!</h1>
+      <p class="mt-5 max-w-2xl text-lg text-lau-cream">Nu sa kidavaki ena bula vinaka ena weta vatavata ni Yasana kaiei. Sa vakanuinui vinaka tu yani ena omunu veisiko saka tu mai!</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3">
+        <a href="{% url 'accounts:login' %}" class="min-h-12 rounded-md bg-lau-gold px-5 py-3 text-center font-semibold text-lau-navy">A qou Jikina</a>
+        <a href="{% url 'public:about' %}" class="min-h-12 rounded-md border border-lau-gold px-5 py-3 text-center font-semibold text-lau-gold">Veika me baleji Lau</a>
+      </div>
+    </div>
+  </div>
+  <!-- Premium animated logo -->
+<div class="hero-logo-orbit">
+  <div class="hero-logo-glow"></div>
+
+  <img
+    src="{% static 'images/logo_lau.png' %}"
+    alt="Lau Provincial Council logo"
+    class="hero-premium-logo"
+  >
+</div>
+</section>
+{% include "partials/masi_divider.html" %}
+<section class="max-w-6xl mx-auto px-4 py-10">
+  <!-- Section heading -->
+  <div class="text-center mb-8">
+    <p class="text-sm uppercase tracking-[0.2em] text-lau-muted">Ratu Tevita Uluilakeba Mara</p>
+    <h2 class="mt-2 font-display text-3xl md:text-4xl text-lau-navy">
+      Gone Turaga Bale na Tui Nayau, Sau ni Vanua ko Lau, Tui Lau
+    </h2>
+    <p class="mt-3 text-lau-muted max-w-2xl mx-auto">
+      A odra vakatatabu saka kivei keta a lewe ni Yassana ko Lau
+    </p>
+  </div>
+  <div class="grid items-center gap-10 lg:grid-cols-2">
+      
+      <!-- LEFT: TEXT CONTENT -->
+      <div class="chief-honour-copy">
+        
+        <p class="section-lead">
+          A odra vakatatabu saka kivei keda na lewe ni Yasana ko Lau, me da
+          vakarokorokotaka ka maroroya na i tovo, na i vakarau, kei na
+          i tuvatuva vakavanua sa mai yaco mai ena noda kawa kei na noda vanua.
+        </p>
+
+        <p class="section-copy">
+          Na tikina oqo e vakaraitaka na noda dokai na Turaga Bale ni Yasana,
+          kei na kena bibi me maroroi tiko ga na veiliutaki vakavanua,
+          na veiwekani vakaitikotiko, kei na yalo ni veiqaravi vata ena
+          loma ni Yasana ko Lau. E dua na ivakananumi ni noda itovo vakavanua
+          kei na noda i vakarau ni bula me vaka na kawa ni Lau.
+        </p>
+
+        <p class="section-copy">
+          E tiko ena loma ni veivakatorocaketaki ni Yasana na bibi ni
+          vakaturagataki, na veilomani, na veidokai kei na veivakabauti,
+          me rawa ni toso vata kina na Yasana kei ira na luveda ena gauna mai muri.
+        </p>
+
+        <div class="chief-meta">
+          <span class="chief-pill">Na Yalo Vata</span>
+          <span class="chief-pill">Na Veiqaravi Vakavanua</span>
+          <span class="chief-pill">Na Dokai ni Vanua</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: IMAGE -->
+      <div class="chief-honour-image-wrap">
+        <div class="chief-image-frame">
+          <img
+            src="{% static 'images/TuiLau.png' %}"
+            alt="Gone Turaga Bale na Tui Nayau, Sau ni Vanua ko Lau, Tui Lau"
+            class="chief-honour-image"
+          >
+        </div>
+      </div>
+
+    </div>
+</section>
+
+{% include "partials/masi_divider.html" %}
+<section class="lau-stats-parallax " style="background-image: url('{% static 'images/homepagecover.png' %}');">
+  <div class="lau-stats-overlay">
+    <div class="max-w-6xl mx-auto px-4 py-14 relative z-10">
+          <!-- Section heading -->
+          <div class="text-center mb-8">
+            <p class="text-sm uppercase tracking-[0.2em] text-lau-cream">Yasana ko Lau</p>
+            <h2 class="mt-2 font-display text-3xl md:text-4xl text-lau-gold">
+              A weta i Wiliwili
+            </h2>
+            <p class="mt-3 text-lau-cream max-w-2xl mx-auto">
+              A weta i wiliwili ena loma ni Yasana ko Lau.
+            </p>
+          </div>
+
+          <!-- Count cards -->
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+            <!-- Island Groups / Coverage -->
+            <div class="masi-card-accent rounded-2xl bg-lau-white p-6 shadow-sm text-center">
+              <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-lau-gold bg-lau-navy text-lau-gold shadow-md">
+                <span class="font-display text-3xl font-bold">3</span>
+              </div>
+              <h3 class="mt-5 font-display text-2xl text-lau-navy">Wasewase</h3>
+              <p class="mt-2 text-sm text-lau-muted">Lau Matanisiga, Lau Tagane kei Lau Qio</p>
+            </div>
+            
+            <!-- Total Tikina -->
+            <div class="masi-card-accent rounded-2xl bg-lau-white p-6 shadow-sm text-center">
+              <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-lau-gold bg-lau-navy text-lau-gold shadow-md">
+                <span class="font-display text-3xl font-bold">13</span>
+              </div>
+              <h3 class="mt-5 font-display text-2xl text-lau-navy">Tikina</h3>
+              <p class="mt-2 text-sm text-lau-muted">Levu taucoko ni Tikina</p>
+            </div>
+
+            <!-- Total Koro -->
+            <div class="masi-card-accent rounded-2xl bg-lau-white p-6 shadow-sm text-center">
+              <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-lau-gold bg-lau-navy text-lau-gold shadow-md">
+                <span class="font-display text-3xl font-bold">72</span>
+              </div>
+              <h3 class="mt-5 font-display text-2xl text-lau-navy">Koro</h3>
+              <p class="mt-2 text-sm text-lau-muted">Levu taucoko ni Koro</p>
+            </div>
+
+            <!-- Yavusa -->
+            <div class="masi-card-accent rounded-2xl bg-lau-white p-6 shadow-sm text-center">
+              <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-lau-gold bg-lau-navy text-lau-gold shadow-md">
+                <span class="font-display text-3xl font-bold">73</span>
+              </div>
+              <h3 class="mt-5 font-display text-2xl text-lau-navy">Yavusa</h3>
+              <p class="mt-2 text-sm text-lau-muted">Levu taucoko ni Yavusa</p>
+            </div>   
+            
+            <!-- Mataqali -->
+            <div class="masi-card-accent rounded-2xl bg-lau-white p-6 shadow-sm text-center">
+              <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-lau-gold bg-lau-navy text-lau-gold shadow-md">
+                <span class="font-display text-3xl font-bold">228</span>
+              </div>
+              <h3 class="mt-5 font-display text-2xl text-lau-navy">Mataqali</h3>
+              <p class="mt-2 text-sm text-lau-muted">Levu taucoko ni Mataqali</p>
+            </div> 
+
+            <!-- Tokatoka -->
+            <div class="masi-card-accent rounded-2xl bg-lau-white p-6 shadow-sm text-center">
+              <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full border-4 border-lau-gold bg-lau-navy text-lau-gold shadow-md">
+                <span class="font-display text-3xl font-bold">465</span>
+              </div>
+              <h3 class="mt-5 font-display text-2xl text-lau-navy">Tokatoka</h3>
+              <p class="mt-2 text-sm text-lau-muted">Levu taucoko ni tokatoka</p>
+            </div> 
+          </div>
+    </div>        
+  </div>
+</section>
+
+{% include "partials/masi_divider.html" %}
+
+<section class="max-w-6xl mx-auto px-4 py-10">
+  <!-- Section heading -->
+  <div class="text-center mb-8">
+    <p class="text-sm uppercase tracking-[0.2em] text-lau-muted">Yasana ko Lau</p>
+    <h2 class="mt-2 font-display text-3xl md:text-4xl text-lau-navy">
+      Talanoa kei na Tukutuku eso!
+    </h2>
+    <p class="mt-3 text-lau-muted max-w-2xl mx-auto">
+      A weta i tukutuku kaburaki ena loma ni Yasana
+    </p>
+  </div>
+  <div class="mt-6 grid gap-5 md:grid-cols-3">
+    {% for post in homepage_news %}
+      <article class="overflow-hidden rounded-md bg-lau-white shadow-sm">
+        {% if post.cover_image %}
+          <img src="{{ post.cover_image.url }}" alt="" class="h-44 w-full object-cover">
+        {% else %}
+          <div class="h-44 bg-gradient-to-br from-lau-navy to-lau-ocean"></div>
+        {% endif %}
+        <div class="p-5">
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            {% if post.category %}
+              <span class="rounded bg-lau-gold px-2 py-1 font-semibold text-lau-navy">{{ post.category.name }}</span>
+            {% endif %}
+            <span class="text-lau-muted">{{ post.published_at|date:"d M Y" }}</span>
+          </div>
+          <h3 class="mt-3 font-display text-xl text-lau-navy">{{ post.title }}</h3>
+          <p class="mt-2 text-sm text-gray-700">{{ post.summary|truncatechars:120 }}</p>
+          <a href="{% url 'news:detail' post.slug %}" class="mt-4 inline-flex font-semibold text-lau-earth">Read More &rarr;</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="rounded-md bg-lau-white p-5 text-gray-700 shadow-sm md:col-span-3">No published news yet.</div>
+    {% endfor %}
+  </div>
+</section>
+
+{% include "partials/masi_divider.html" %}
+
+<section class="max-w-6xl mx-auto px-4 py-10">
+  
+    <!-- Section heading -->
+    <div class="text-center mb-8">
+      <p class="text-sm uppercase tracking-[0.2em] text-lau-muted">Yasana ko Lau</p>
+      <h2 class="mt-2 font-display text-3xl md:text-4xl text-lau-navy">
+        Ko keta kei na weta vuravura
+      </h2>
+      <p class="mt-3 text-lau-muted max-w-2xl mx-auto">
+        A veika ka keta kilai kina ena loma ni Yasana ko Lau
+      </p>
+    
+    <a href="{% url 'public:about' %}" class="font-semibold text-lau-earth">A weta i Talanoa &rarr;</a>
+  </div>
+  <div class="mt-6 grid gap-3 md:grid-cols-4">
+    <img src="{% static 'images/gallery/image14.jfif' %}" alt="Turquoise lagoon in Lau" class="h-72 w-full rounded-md object-cover shadow-sm md:col-span-2 md:row-span-2 md:h-full">
+    <img src="{% static 'images/gallery/image19.jfif' %}" alt="Community singers in a traditional house" class="h-44 w-full rounded-md object-cover shadow-sm">
+    <img src="{% static 'images/gallery/image24.jfif' %}" alt="Lau cultural dancers" class="h-44 w-full rounded-md object-cover shadow-sm">
+    <img src="{% static 'images/gallery/image20.jfif' %}" alt="Women weaving mats" class="h-44 w-full rounded-md object-cover shadow-sm">
+    <img src="{% static 'images/gallery/image4.jfif' %}" alt="White sand beach and coconut palms" class="h-44 w-full rounded-md object-cover shadow-sm">
+  </div>
+</section>
+
+{% include "partials/masi_divider.html" %}
+
+<section class="max-w-6xl mx-auto px-4 py-10">
+  <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div>
+      <p class="text-sm font-semibold uppercase text-lau-earth">Na cakacaka</p>
+      <h2 class="font-display text-3xl text-lau-navy">Upcoming Events</h2>
+    </div>
+    <a href="{% url 'events:list' %}" class="font-semibold text-lau-earth">View all events &rarr;</a>
+  </div>
+
+  <div class="mt-6 grid gap-5 md:grid-cols-3">
+    {% for event in homepage_events %}
+      <article class="rounded-md bg-lau-white p-5 shadow-sm">
+        <div class="flex items-start justify-between gap-4">
+          <div class="rounded-md bg-lau-navy px-4 py-3 text-center text-lau-gold">
+            <span class="block text-3xl font-bold leading-none">{{ event.start_date|date:"d" }}</span>
+            <span class="text-xs uppercase">{{ event.start_date|date:"M" }}</span>
+          </div>
+          <span class="rounded px-2 py-1 text-xs font-semibold {% if event.status == 'ongoing' %}bg-yellow-100 text-yellow-800{% else %}bg-teal-100 text-teal-800{% endif %}">{{ event.get_status_display }}</span>
+        </div>
+        <h3 class="mt-4 font-display text-xl text-lau-navy">{{ event.title }}</h3>
+        <p class="mt-2 text-sm font-semibold text-lau-earth">{{ event.location }}</p>
+        <p class="mt-3 text-sm text-gray-700">{{ event.description|truncatechars:130 }}</p>
+        <a href="{% url 'events:detail' event.slug %}" class="mt-4 inline-flex font-semibold text-lau-earth">View Event &rarr;</a>
+      </article>
+    {% empty %}
+      <div class="rounded-md bg-lau-white p-5 text-gray-700 shadow-sm md:col-span-3">No upcoming events yet.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

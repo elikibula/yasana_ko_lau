@@ -1,0 +1,68 @@
+.masi-ribbon {
+    width: 100%;
+    height: 95px;
+    background-color: #f4ead6;
+    border-top: 5px solid #1f130e;
+    border-bottom: 5px solid #1f130e;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top diamond band */
+.masi-ribbon::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 48px;
+    width: 100%;
+    background:
+        linear-gradient(45deg, transparent 35%, #20120d 36%, #20120d 45%, transparent 46%),
+        linear-gradient(-45deg, transparent 35%, #20120d 36%, #20120d 45%, transparent 46%),
+        linear-gradient(45deg, transparent 55%, #8b3f26 56%, #8b3f26 66%, transparent 67%),
+        linear-gradient(-45deg, transparent 55%, #8b3f26 56%, #8b3f26 66%, transparent 67%),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 14px,
+            rgba(32,18,13,0.9) 14px 16px,
+            transparent 16px 30px
+        );
+    background-size: 58px 48px;
+    background-color: #efe4cf;
+}
+
+/* Middle decorative line */
+.masi-ribbon .middle-line {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 100%;
+    height: 16px;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #20120d 0 10px,
+            transparent 10px 15px,
+            #20120d 15px 25px,
+            transparent 25px 30px
+        );
+    border-top: 3px solid #20120d;
+    border-bottom: 3px solid #20120d;
+}
+
+/* Bottom triangle band */
+.masi-ribbon::after {
+    content: "";
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    height: 31px;
+    background:
+        linear-gradient(135deg, #20120d 25%, transparent 26%),
+        linear-gradient(225deg, #20120d 25%, transparent 26%),
+        radial-gradient(circle at 50% 0, #8b3f26 0 5px, transparent 6px);
+    background-size: 48px 31px, 48px 31px, 48px 20px;
+    background-position: 0 0, 0 0, 0 2px;
+    background-color: #f4ead6;
+}

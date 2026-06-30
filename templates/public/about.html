@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Lau | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="bg-lau-white">
+  <div class="max-w-6xl mx-auto px-4 py-12 md:py-16">
+    <div class="grid overflow-hidden rounded-md border-2 border-lau-gold bg-lau-cream md:grid-cols-[1fr_0.9fr]">
+      <div class="p-6 md:p-10">
+        <p class="text-sm font-semibold uppercase text-lau-earth">About Lau</p>
+        <h1 class="mt-3 font-display text-4xl text-lau-navy">The Lau Group</h1>
+        <p class="mt-5 max-w-3xl text-lg leading-8 text-gray-700">Yasana ko Lau stretches across the eastern waters of Fiji, joining island communities through chiefly leadership, kinship, faith, maritime skill, and careful stewardship of land and sea.</p>
+      </div>
+      <img src="{% static 'images/gallery/image 13.jfif' %}" alt="Lau island lagoon and coastline" class="h-72 w-full object-cover md:h-full">
+    </div>
+  </div>
+</section>
+{% include "partials/masi_divider.html" %}
+<section class="max-w-6xl mx-auto px-4 py-10 grid gap-6 md:grid-cols-3">
+  <article class="overflow-hidden rounded-md bg-lau-white shadow-sm">
+    <img src="{% static 'images/gallery/image17.jfif' %}" alt="Coastal village and mountain ridge" class="h-44 w-full object-cover">
+    <div class="p-6">
+    <h2 class="font-display text-2xl text-lau-navy">Geography</h2>
+    <p class="mt-3 text-gray-700">The Lau islands include Oneata, Moce, Kabara, Fulaga, Ogea, Vatoa, Ono-i-Lau, Cicia, Nayau, Vanuabalavu, Lakeba, and surrounding island communities.</p>
+    </div>
+  </article>
+  <article class="overflow-hidden rounded-md bg-lau-white shadow-sm">
+    <img src="{% static 'images/gallery/image20.jfif' %}" alt="Lau women weaving mats" class="h-44 w-full object-cover">
+    <div class="p-6">
+    <h2 class="font-display text-2xl text-lau-navy">Culture</h2>
+    <p class="mt-3 text-gray-700">Masi, tabua, tokatoka, mataqali, yavusa, and vanua relationships shape identity, ceremony, accountability, and community care.</p>
+    </div>
+  </article>
+  <article class="overflow-hidden rounded-md bg-lau-white shadow-sm">
+    <img src="{% static 'images/gallery/image22.jfif' %}" alt="Community leaders gathered outdoors" class="h-44 w-full object-cover">
+    <div class="p-6">
+    <h2 class="font-display text-2xl text-lau-navy">Leadership</h2>
+    <p class="mt-3 text-gray-700">The Roko Tui Lau and Provincial Office coordinate public administration with village, tikina, and yavusa leaders throughout Lau.</p>
+    </div>
+  </article>
+</section>
+{% endblock %}

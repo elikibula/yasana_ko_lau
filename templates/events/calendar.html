@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Events Calendar | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-8">
+  <div class="rounded-md bg-lau-white p-6 shadow-sm">
+    <div class="flex items-center justify-between">
+      <a class="font-semibold text-lau-earth" href="{% url 'events:list' %}">&larr; Events</a>
+      <h1 class="font-display text-3xl text-lau-navy">{{ current_month|date:"F Y" }}</h1>
+    </div>
+    <div id="eventCalendar" class="mt-6 grid grid-cols-7 gap-2 text-sm"></div>
+  </div>
+  <section class="mt-8 rounded-md bg-lau-white p-6 shadow-sm">
+    <h2 class="font-display text-2xl text-lau-navy">This Month</h2>
+    <div class="mt-4 grid gap-3">
+      {% for event in month_events %}
+        <a class="rounded border border-lau-gold/30 p-3 hover:bg-lau-cream" href="{% url 'events:detail' event.slug %}">
+          <strong class="text-lau-navy">{{ event.title }}</strong>
+          <span class="block text-sm text-lau-muted">{{ event.start_date|date:"d M Y" }} · {{ event.location }}</span>
+        </a>
+      {% empty %}
+        <p class="text-gray-700">No events this month.</p>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+<script>
+  const groupedEvents = {{ events_json|safe }};
+  const calendar = document.getElementById("eventCalendar");
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
+    calendar.insertAdjacentHTML("beforeend", `<div class="font-semibold text-lau-navy">${day}</div>`);
+  });
+  for (let i = 0; i < first.getDay(); i++) calendar.insertAdjacentHTML("beforeend", "<div></div>");
+  for (let day = 1; day <= last.getDate(); day++) {
+    const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const items = groupedEvents[key] || [];
+    calendar.insertAdjacentHTML("beforeend", `<div class="min-h-24 rounded border border-lau-cream p-2"><strong class="text-lau-navy">${day}</strong>${items.map(e => `<a class="mt-1 block truncate text-xs text-lau-earth" href="${e.url}">${e.title}</a>`).join("")}</div>`);
+  }
+</script>
+{% endblock %}

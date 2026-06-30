@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} | Ko Lau Events{% endblock %}
+
+{% block content %}
+<section class="relative min-h-[360px] overflow-hidden bg-lau-navy text-lau-white">
+  {% if event.cover_image %}<img src="{{ event.cover_image.url }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-60">{% endif %}
+  <div class="absolute inset-0 bg-lau-navy/60"></div>
+  <div class="relative max-w-6xl mx-auto px-4 py-20">
+    <span class="rounded bg-lau-gold px-3 py-1 text-sm font-semibold text-lau-navy">{{ event.get_status_display }}</span>
+    <h1 class="mt-5 font-display text-4xl md:text-5xl">{{ event.title }}</h1>
+    <p class="mt-4">{{ event.start_date|date:"d F Y, g:i A" }} · {{ event.location }}</p>
+  </div>
+</section>
+{% include "partials/masi_divider.html" %}
+
+<section class="max-w-6xl mx-auto px-4 py-10 grid gap-6 lg:grid-cols-[1fr_320px]">
+  <div class="rounded-md bg-lau-white p-6 shadow-sm">
+    <h2 class="font-display text-3xl text-lau-navy">Event Details</h2>
+    <div class="mt-4 leading-8 text-gray-800">{{ event.description|linebreaks }}</div>
+  </div>
+  <aside class="space-y-4">
+    <div class="rounded-md border-l-4 border-lau-gold bg-lau-white p-5 shadow-sm">
+      <h2 class="font-display text-2xl text-lau-navy">Date & Time</h2>
+      <p class="mt-2 text-gray-700">{{ event.start_date|date:"d F Y, g:i A" }}</p>
+      {% if event.end_date %}<p class="text-gray-700">Until {{ event.end_date|date:"d F Y, g:i A" }}</p>{% endif %}
+    </div>
+    <div class="rounded-md bg-lau-white p-5 shadow-sm">
+      <h2 class="font-display text-2xl text-lau-navy">Location</h2>
+      <p class="mt-2 text-gray-700">{{ event.location }}</p>
+      {% if event.tikina %}<span class="mt-3 inline-flex rounded bg-lau-cream px-2 py-1 text-sm text-lau-earth">{{ event.tikina }}</span>{% endif %}
+    </div>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'events:rsvp' event.slug %}" class="rounded-md bg-lau-white p-5 shadow-sm">
+        {% csrf_token %}
+        <h2 class="font-display text-2xl text-lau-navy">RSVP</h2>
+        <p class="mt-2 text-sm text-lau-muted">{{ attending_count }} people attending</p>
+        <div class="mt-4 grid gap-2">
+          <button name="attending" value="true" class="rounded-md bg-lau-gold px-4 py-3 font-semibold text-lau-navy" type="submit">Yes, I'll be there</button>
+          <button name="attending" value="false" class="rounded-md border border-lau-gold px-4 py-3 font-semibold text-lau-earth" type="submit">Can't make it</button>
+        </div>
+      </form>
+    {% endif %}
+  </aside>
+</section>
+{% endblock %}

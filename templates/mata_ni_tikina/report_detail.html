@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Report Detail{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-8">
+  <div class="rounded-lg bg-lau-navy p-6 text-lau-cream">
+    <p class="text-sm font-semibold uppercase text-lau-gold">{{ report.quarter }} {{ report.year }}</p>
+    <h1 class="font-display text-3xl">{{ report }}</h1>
+    <div class="mt-4 flex flex-wrap gap-2">{% for label,value in stats %}<span class="rounded-full bg-white/10 px-4 py-2 text-sm">{{ label }}: {{ value }}</span>{% endfor %}</div>
+  </div>
+  <div class="mt-6 grid gap-6">
+    {% for title, items in sections %}
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <h2 class="font-display text-xl text-lau-navy">{{ title }}</h2>
+        <dl class="mt-4 grid gap-3 md:grid-cols-2">
+          {% for label,value in items %}<div><dt class="text-xs font-semibold uppercase text-lau-muted">{{ label }}</dt><dd class="mt-1 text-lau-navy">{{ value }}</dd></div>{% endfor %}
+        </dl>
+      </section>
+    {% endfor %}
+    {% for title, rows in child_sections %}
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <h2 class="font-display text-xl text-lau-navy">{{ title }}</h2>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <tbody class="divide-y divide-lau-cream">
+              {% for row in rows %}
+                <tr>{% for label,value in row %}<td class="px-3 py-2"><span class="block text-xs font-semibold text-lau-muted">{{ label }}</span>{{ value }}</td>{% endfor %}</tr>
+              {% empty %}
+                <tr><td class="px-3 py-4 text-lau-muted">No records.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

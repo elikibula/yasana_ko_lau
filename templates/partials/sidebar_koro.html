@@ -1,0 +1,9 @@
+<aside class="rounded-md bg-lau-navy p-3 text-lau-cream md:sticky md:top-4">
+  <nav class="grid gap-1 text-sm font-semibold">
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'turaga_dashboard' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:turaga_dashboard' %}">Dashboard</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'accounts' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'accounts:profile' %}">Tukutuku baleji Au</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:report_create' %}">Vola vou dua qou Ripote</a>
+    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'report_list' or request.resolver_match.url_name == 'report_detail' or request.resolver_match.url_name == 'report_edit' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:report_list' %}">List ni qou Ripote</a>
+    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'public:contact' %}">Help &amp; Contact</a>
+  </nav>
+</aside>

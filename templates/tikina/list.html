@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Na Jikina | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="bg-lau-navy text-lau-cream">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <p class="text-xs font-bold uppercase tracking-[0.25em] text-lau-gold">
+      Yasana ko Lau
+    </p>
+    <h1 class="mt-3 font-display text-3xl md:text-5xl">
+      Na Jikina ena loma ni Yasana ko Lau
+    </h1>
+    <p class="mt-4 max-w-3xl text-sm text-lau-cream/85">
+      13 taucoko a Jikina ena loma ni Yasana &middot; {{ total_koro_count }} levu taucoko ni Koro &middot; {{ total_population|intcomma }} Tagane-Marama &middot; Yasana ko Lau
+    </p>
+  </div>
+</section>
+
+{% include "partials/masi_divider.html" %}
+
+<section class="max-w-6xl mx-auto px-4 py-8">
+
+  <div class="mb-6 flex flex-wrap gap-2">
+    <a href="?"
+       class="rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition
+       {% if not active_island_group %}
+         border-lau-navy bg-lau-navy text-lau-cream shadow-sm
+       {% else %}
+         border-lau-navy/20 bg-white text-lau-navy hover:border-lau-gold hover:text-lau-gold
+       {% endif %}">
+      All
+    </a>
+
+    {% for group in island_groups %}
+      <a href="?island_group={{ group|urlencode }}"
+         class="rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition
+         {% if active_island_group == group %}
+           border-lau-navy bg-lau-navy text-lau-cream shadow-sm
+         {% else %}
+           border-lau-navy/20 bg-white text-lau-navy hover:border-lau-gold hover:text-lau-gold
+         {% endif %}">
+        {{ group }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {% for tikina in tikina_list %}
+      <article class="group overflow-hidden rounded-2xl border border-lau-navy/10 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-lau-gold/60 hover:shadow-xl">
+
+        <div class="relative">
+          {% with cover_image=tikina.gallery_images.all.0 %}
+            {% if cover_image %}
+              <img src="{{ cover_image.image.url }}"
+                   alt="{{ cover_image.caption|default:tikina.name }}"
+                   class="h-32 w-full object-cover transition duration-500 group-hover:scale-105">
+            {% else %}
+              <div class="masi-pattern grid h-32 w-full place-items-center bg-lau-navy">
+                <span class="font-display text-4xl text-lau-gold">
+                  
+                </span>
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <div class="absolute inset-0 bg-gradient-to-t from-lau-navy/70 via-lau-navy/10 to-transparent"></div>
+
+          <span class="absolute left-3 top-3 grid h-9 w-9 place-items-center rounded-full border border-white/40 bg-lau-gold text-sm font-black text-lau-navy shadow">
+            {{ tikina.number }}
+          </span>
+
+          {% if tikina.island_group %}
+            <span class="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-lau-navy shadow">
+              {{ tikina.island_group }}
+            </span>
+          {% endif %}
+
+          <div class="absolute bottom-3 left-3 right-3">
+            <h2 class="font-display text-2xl leading-none text-lau-gold">
+              {{ tikina.name }}
+            </h2>
+            <p class="mt-1 truncate text-xs font-semibold text-lau-cream">
+              {{ tikina.koro_turaga }}
+            </p>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="rounded-xl bg-lau-cream/70 px-3 py-2">
+              <p class="text-[10px] font-bold uppercase tracking-wide text-lau-muted">Levu ni Koro ena Jikina</p>
+              <p class="text-sm font-black text-lau-navy">{{ tikina.koro_db_count }}</p>
+            </div>
+
+            {% if tikina.population > 0 %}
+              <div class="rounded-xl bg-lau-cream/70 px-3 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-wide text-lau-muted">Population</p>
+                <p class="text-sm font-black text-lau-navy">{{ tikina.population|intcomma }}</p>
+              </div>
+            {% endif %}
+
+            {% if tikina.mataqali_count > 0 %}
+              <div class="rounded-xl bg-lau-cream/70 px-3 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-wide text-lau-muted">Mataqali</p>
+                <p class="text-sm font-black text-lau-navy">{{ tikina.mataqali_count }}</p>
+              </div>
+            {% endif %}
+
+            {% if tikina.mata_ni_tikina %}
+              <div class="rounded-xl bg-lau-cream/70 px-3 py-2">
+                <p class="text-[10px] font-bold uppercase tracking-wide text-lau-muted">Mata ni Tikina</p>
+                <p class="truncate text-xs font-bold text-lau-navy">
+                  {{ tikina.mata_ni_tikina.user.get_full_name }}
+                </p>
+              </div>
+            {% endif %}
+          </div>
+
+          {% if tikina.description %}
+            <p class="mt-3 line-clamp-2 text-xs leading-5 text-lau-muted">
+              {{ tikina.description|truncatewords:14 }}
+            </p>
+          {% endif %}
+
+          {% if tikina.koro.all %}
+            <details class="mt-3 rounded-xl border border-lau-navy/10 bg-lau-cream/40 p-3 text-xs hover:bg-lau-gold hover:text-lau-navy">
+              <summary class="cursor-pointer font-bold text-lau-navy hover:bg-lau-gold hover:text-lau-navy">
+                Yacadra Koro ena loma ni Jikina
+              </summary>
+
+              <div class="mt-3 flex max-h-24 flex-wrap gap-1.5 overflow-y-auto pr-1">
+                {% for koro in tikina.koro.all %}
+                  <span class="rounded-full bg-white px-2 py-1 text-[11px] shadow-sm
+                    {% if koro.is_koro_turaga %}
+                      font-bold text-lau-earth
+                    {% else %}
+                      text-gray-700
+                    {% endif %}">
+                    {{ koro.name }}
+                  </span>
+                {% endfor %}
+              </div>
+            </details>
+          {% endif %}
+
+          <a href="{% url 'tikina:detail' tikina.slug %}"
+             class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-lau-navy px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-lau-cream transition hover:bg-lau-gold hover:text-lau-navy">
+            Tukutuku ni Jikina &rarr;
+          </a>
+        </div>
+      </article>
+    {% empty %}
+      <p class="rounded-md bg-lau-white p-5 text-gray-700">
+        No Tikina data has been loaded yet.
+      </p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

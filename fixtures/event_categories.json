@@ -1,0 +1,7 @@
+[
+  {"model": "events.eventcategory", "pk": 1, "fields": {"name": "Ceremony / Vakayalia", "slug": "ceremony"}},
+  {"model": "events.eventcategory", "pk": 2, "fields": {"name": "Provincial Meeting", "slug": "meeting"}},
+  {"model": "events.eventcategory", "pk": 3, "fields": {"name": "Cultural Festival", "slug": "cultural"}},
+  {"model": "events.eventcategory", "pk": 4, "fields": {"name": "Sports & Recreation", "slug": "sports"}},
+  {"model": "events.eventcategory", "pk": 5, "fields": {"name": "Community Gathering", "slug": "community"}}
+]

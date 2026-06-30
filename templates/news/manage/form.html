@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} News | Yasana ko Lau{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="font-display text-3xl text-lau-navy">{% if object %}Edit News Post{% else %}Create News Post{% endif %}</h1>
+  <form method="post" enctype="multipart/form-data" class="mt-6 space-y-5 rounded-md bg-lau-white p-6 shadow-sm">
+    {% csrf_token %}
+    {% for field in form %}
+      <div>
+        <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}</label>
+        <div class="mt-2">{{ field }}</div>
+        {% if field.help_text %}<p class="mt-1 text-xs text-lau-muted">{{ field.help_text }}</p>{% endif %}
+        {% for error in field.errors %}<p class="mt-1 text-sm text-red-700">{{ error }}</p>{% endfor %}
+      </div>
+    {% endfor %}
+    <div class="flex gap-3">
+      <button class="rounded-md bg-lau-gold px-5 py-3 font-semibold text-lau-navy" type="submit">Save Post</button>
+      <a class="rounded-md border border-lau-gold px-5 py-3 font-semibold text-lau-earth" href="{% url 'news:manage' %}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

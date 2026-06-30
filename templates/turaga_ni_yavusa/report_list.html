@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Turaga ni Yavusa Reports{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-8">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div><p class="text-sm font-semibold uppercase text-lau-earth">Turaga ni Yavusa</p><h1 class="font-display text-3xl text-lau-navy">A qou Ripote</h1></div>
+    <a href="{% url 'turaga_ni_yavusa:report_create' %}" class="rounded-md bg-lau-gold px-4 py-3 text-sm font-semibold text-lau-navy">+ Ivolavola Vou</a>
+  </div>
+  <div class="mt-6 overflow-x-auto rounded-md bg-lau-white shadow-sm">
+    <table class="min-w-full text-sm">
+      <thead class="bg-lau-navy text-lau-cream"><tr><th class="px-4 py-3 text-left">Yavusa</th><th class="px-4 py-3">Kuata</th><th class="px-4 py-3">Yabaki</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr></thead>
+      <tbody class="divide-y divide-lau-cream">
+        {% for report in reports %}
+          <tr><td class="px-4 py-3 font-semibold text-lau-navy">{{ report.yavusa }}</td><td class="px-4 py-3 text-center">{{ report.quarter }}</td><td class="px-4 py-3 text-center">{{ report.year }}</td><td class="px-4 py-3 text-center">{{ report.get_status_display }}</td><td class="px-4 py-3 text-right"><a class="font-semibold text-lau-earth" href="{% url 'turaga_ni_yavusa:report_detail' report.pk %}">Kila</a></td></tr>
+        {% empty %}
+          <tr><td colspan="5" class="px-4 py-8 text-center text-lau-muted">E se bera ni dua na ripote.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
