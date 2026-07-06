@@ -12,6 +12,7 @@ env/
 
 media/
 tmp/
+staticfiles/
 
 .env
 .env.*
