@@ -4,16 +4,16 @@
 <section class="mx-auto max-w-6xl px-4 py-8">
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div><p class="text-sm font-semibold uppercase text-lau-earth">Turaga ni Yavusa</p><h1 class="font-display text-3xl text-lau-navy">A qou Ripote</h1></div>
-    <a href="{% url 'turaga_ni_yavusa:report_create' %}" class="rounded-md bg-lau-gold px-4 py-3 text-sm font-semibold text-lau-navy">+ Ivolavola Vou</a>
+    <a href="{% url 'turaga_ni_yavusa:report_create' %}" class="rounded-md bg-lau-gold px-4 py-3 text-sm font-semibold text-lau-navy">+ Ripote Vou</a>
   </div>
   <div class="mt-6 overflow-x-auto rounded-md bg-lau-white shadow-sm">
     <table class="min-w-full text-sm">
-      <thead class="bg-lau-navy text-lau-cream"><tr><th class="px-4 py-3 text-left">Yavusa</th><th class="px-4 py-3">Kuata</th><th class="px-4 py-3">Yabaki</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr></thead>
+      <thead class="bg-lau-navy text-lau-cream"><tr><th class="px-4 py-3 text-left">Yavusa</th><th class="px-4 py-3">Kuata</th><th class="px-4 py-3">Yabaki</th><th class="px-4 py-3">Siga me vakau</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr></thead>
       <tbody class="divide-y divide-lau-cream">
         {% for report in reports %}
-          <tr><td class="px-4 py-3 font-semibold text-lau-navy">{{ report.yavusa }}</td><td class="px-4 py-3 text-center">{{ report.quarter }}</td><td class="px-4 py-3 text-center">{{ report.year }}</td><td class="px-4 py-3 text-center">{{ report.get_status_display }}</td><td class="px-4 py-3 text-right"><a class="font-semibold text-lau-earth" href="{% url 'turaga_ni_yavusa:report_detail' report.pk %}">Kila</a></td></tr>
+          <tr><td class="px-4 py-3 font-semibold text-lau-navy">{{ report.yavusa }}</td><td class="px-4 py-3 text-center">{{ report.quarter }}</td><td class="px-4 py-3 text-center">{{ report.year }}</td><td class="px-4 py-3 text-center">{{ report.due_date|date:"d M Y" }}{% if report.is_overdue %}<span class="ml-2 rounded bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">Sivia</span>{% endif %}</td><td class="px-4 py-3 text-center">{{ report.get_status_display }}</td><td class="px-4 py-3 text-right"><a class="font-semibold text-lau-earth" href="{% url 'turaga_ni_yavusa:report_detail' report.pk %}">Wilika</a>{% if report.status == "approved_roko" %}<span class="text-lau-muted"> / </span><a class="font-semibold text-lau-earth" href="{% url 'turaga_ni_yavusa:report_pdf' report.pk %}">PDF</a>{% endif %}</td></tr>
         {% empty %}
-          <tr><td colspan="5" class="px-4 py-8 text-center text-lau-muted">E se bera ni dua na ripote.</td></tr>
+          <tr><td colspan="6" class="px-4 py-8 text-center text-lau-muted">E se bera ni dua na ripote.</td></tr>
         {% endfor %}
       </tbody>
     </table>

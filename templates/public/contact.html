@@ -8,21 +8,68 @@
   <div>
     <p class="text-sm font-semibold uppercase text-lau-earth">Provincial Office</p>
     <h1 class="font-display text-4xl text-lau-navy">Contact</h1>
-    <p class="mt-4 text-gray-700 leading-7">Send a message to the Lau Provincial Office for reporting support, public enquiries, and administration matters.</p>
-    <img src="{% static 'images/gallery/image1.jfif' %}" alt="Lau village and community landscape" class="mt-6 h-72 w-full rounded-md object-cover shadow-sm">
+
+    <p class="mt-4 text-gray-700 leading-7">
+      Contact the Lau Provincial Office for reporting support, public enquiries,
+      and administration matters.
+    </p>
+
+    <img src="{% static 'images/gallery/image1.jfif' %}"
+         alt="Lau village and community landscape"
+         class="mt-6 h-72 w-full rounded-md object-cover shadow-sm">
   </div>
-  <form method="post" class="rounded-md bg-lau-white p-6 shadow-sm">
-    {% csrf_token %}
-    <div class="grid gap-4">
-      {% for field in form %}
-        <label class="grid gap-2 text-sm font-semibold text-lau-navy">
-          {{ field.label }}
-          {{ field }}
-          {% if field.errors %}<span class="text-sm text-red-700">{{ field.errors|join:", " }}</span>{% endif %}
-        </label>
-      {% endfor %}
-      <button class="min-h-12 rounded-md bg-lau-ocean px-5 font-semibold text-white" type="submit">Send Message</button>
+
+  <div class="rounded-md bg-lau-white p-6 shadow-sm border border-lau-navy/10">
+    <p class="text-sm font-semibold uppercase text-lau-earth">Lau Provincial Council</p>
+    <h2 class="mt-2 font-display text-3xl text-lau-navy">Office Contact Details</h2>
+
+    <div class="mt-6 space-y-5 text-gray-700">
+
+      <div>
+        <p class="text-xs font-semibold uppercase text-lau-muted">Office Address</p>
+        <p class="mt-1 font-semibold text-lau-navy">
+          2nd Floor, Yatu Lau Arcade, Suva
+        </p>
+      </div>
+
+      <div>
+        <p class="text-xs font-semibold uppercase text-lau-muted">Postal Address</p>
+        <p class="mt-1 font-semibold text-lau-navy">
+          P.O. Box 15163, Suva, Fiji
+        </p>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="rounded-md bg-lau-cream/40 p-4">
+          <p class="text-xs font-semibold uppercase text-lau-muted">Phone</p>
+          <p class="mt-1 font-semibold text-lau-navy">☎ +679 331 6801</p>
+        </div>
+
+        <div class="rounded-md bg-lau-cream/40 p-4">
+          <p class="text-xs font-semibold uppercase text-lau-muted">Mobile</p>
+          <p class="mt-1 font-semibold text-lau-navy">📱 +679 773 4342</p>
+        </div>
+      </div>
+
+      <div class="rounded-md bg-lau-navy p-5 text-lau-cream">
+        <p class="text-xs font-semibold uppercase text-lau-gold">Email</p>
+        <a href="mailto:lauprovince@gmail.com"
+           class="mt-1 block font-semibold hover:text-lau-gold">
+          ✉ lauprovince@gmail.com
+        </a>
+      </div>
+
+      <div class="rounded-md border border-lau-gold/40 bg-white p-5">
+        <p class="text-xs font-semibold uppercase text-lau-muted">Website</p>
+        <a href="https://www.lauprovincialcouncil.org"
+           target="_blank"
+           rel="noopener"
+           class="mt-1 block font-semibold text-lau-navy hover:text-lau-earth">
+          🌐 www.lauprovincialcouncil.org
+        </a>
+      </div>
+
     </div>
-  </form>
+  </div>
 </section>
 {% endblock %}

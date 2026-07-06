@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Ripote ni Mata ni Tikina{% endblock %}
 {% block content %}
+<style>
+  [data-formset="income_activities"] input[type="checkbox"] {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+</style>
 <section class="bg-lau-cream py-8">
   <form method="post" class="mx-auto max-w-6xl px-4">
     {% csrf_token %}
@@ -16,11 +22,53 @@
         {% elif block.type == "section" %}
           <section class="rounded-md bg-lau-white p-5 shadow-sm">
             <h2 class="font-display text-xl text-lau-navy">{{ block.title }}</h2>
-            <div class="mt-4 grid gap-4 md:grid-cols-2">
-              {% for field in block.fields %}
-                <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}{{ field }}{% if field.help_text %}<span class="mt-1 block text-xs font-normal text-lau-muted">{{ field.help_text }}</span>{% endif %}{% for error in field.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
-              {% endfor %}
-            </div>
+            {% if block.fields %}
+              <div class="mt-4 grid gap-4 md:grid-cols-2">
+                {% for field in block.fields %}
+                  <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}{{ field }}<span class="mt-1 block text-xs font-normal text-lau-muted"></span>{% for error in field.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% for inline in block.formsets %}
+              <div class="mt-5" data-formset="{{ inline.key }}">
+                <div class="flex justify-end">
+                  <button type="button" class="rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy" data-add-row="{{ inline.key }}">Insert New Record</button>
+                </div>
+                {{ inline.formset.management_form }}
+                <div class="mt-3 overflow-x-auto">
+                  <table class="min-w-full border-separate border-spacing-0 text-sm">
+                    <thead>
+                      <tr class="bg-lau-cream text-left text-lau-navy">
+                        {% for field in inline.formset.empty_form.visible_fields %}
+                          <th class="border-b border-lau-navy/10 px-3 py-2 font-semibold">{{ field.label }}</th>
+                        {% endfor %}
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-lau-navy/10" data-rows="{{ inline.key }}">
+                      {% for form in inline.formset.forms %}
+                        <tr class="align-top">
+                          {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+                          {% for field in form.visible_fields %}
+                            <td class="min-w-48 px-3 py-3">
+                              {{ field }}
+                              {% for error in field.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}
+                            </td>
+                          {% endfor %}
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <template data-empty-form="{{ inline.key }}">
+                  <tr class="align-top">
+                    {% for hidden in inline.formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                    {% for field in inline.formset.empty_form.visible_fields %}
+                      <td class="min-w-48 px-3 py-3">{{ field }}</td>
+                    {% endfor %}
+                  </tr>
+                </template>
+              </div>
+            {% endfor %}
           </section>
         {% elif block.type == "formset" or block.type == "matrix" %}
           <section class="rounded-md bg-lau-white p-5 shadow-sm" data-formset="{{ block.key }}">
@@ -30,28 +78,36 @@
             </div>
             {{ block.formset.management_form }}
             <div class="mt-4 overflow-x-auto">
-              <div class="grid gap-4" data-rows="{{ block.key }}">
-                {% for form in block.formset.forms %}
-                  <div class="rounded-md border border-lau-navy/10 bg-lau-cream/40 p-4">
-                    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-                    <div class="grid gap-4 md:grid-cols-2">
+              <table class="min-w-full border-separate border-spacing-0 text-sm">
+                <thead>
+                  <tr class="bg-lau-cream text-left text-lau-navy">
+                    {% for field in block.formset.empty_form.visible_fields %}
+                      <th class="border-b border-lau-navy/10 px-3 py-2 font-semibold">{{ field.label }}</th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-lau-navy/10" data-rows="{{ block.key }}">
+                  {% for form in block.formset.forms %}
+                    <tr class="align-top">
+                      {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
                       {% for field in form.visible_fields %}
-                        <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}{{ field }}{% for error in field.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+                        <td class="min-w-48 px-3 py-3">
+                          {{ field }}
+                          {% for error in field.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}
+                        </td>
                       {% endfor %}
-                    </div>
-                  </div>
-                {% endfor %}
-              </div>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
             <template data-empty-form="{{ block.key }}">
-              <div class="rounded-md border border-lau-navy/10 bg-lau-cream/40 p-4">
+              <tr class="align-top">
                 {% for hidden in block.formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
-                <div class="grid gap-4 md:grid-cols-2">
-                  {% for field in block.formset.empty_form.visible_fields %}
-                    <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}{{ field }}</label>
-                  {% endfor %}
-                </div>
-              </div>
+                {% for field in block.formset.empty_form.visible_fields %}
+                  <td class="min-w-48 px-3 py-3">{{ field }}</td>
+                {% endfor %}
+              </tr>
             </template>
           </section>
         {% endif %}
@@ -74,7 +130,40 @@ document.querySelectorAll('[data-add-row]').forEach((button) => {
     const index = Number(total.value);
     rows.insertAdjacentHTML('beforeend', template.innerHTML.replaceAll('__prefix__', index));
     total.value = index + 1;
+    updateVagalalaTotals();
   });
 });
+
+const councilCountFields = [
+  document.getElementById('id_council_turaga_count'),
+  document.getElementById('id_council_marama_count'),
+  document.getElementById('id_council_daunivakasala_count'),
+];
+const councilTotalField = document.getElementById('id_council_total_attendees');
+function updateCouncilTotal() {
+  if (!councilTotalField) return;
+  councilTotalField.value = councilCountFields.reduce((total, field) => total + Number(field?.value || 0), 0);
+}
+councilCountFields.forEach((field) => field?.addEventListener('input', updateCouncilTotal));
+updateCouncilTotal();
+
+const vagalalaPopulationTotal = document.getElementById('id_vagalala_population_total');
+const vagalalaFamilyTotal = document.getElementById('id_vagalala_family_total');
+function sumVagalalaFields(suffix) {
+  return Array.from(document.querySelectorAll(`input[name^="vagalala-"][name$="-${suffix}"]`)).reduce((total, field) => {
+    return total + Number(field.value || 0);
+  }, 0);
+}
+function updateVagalalaTotals() {
+  if (vagalalaPopulationTotal) vagalalaPopulationTotal.value = sumVagalalaFields('population_count');
+  if (vagalalaFamilyTotal) vagalalaFamilyTotal.value = sumVagalalaFields('family_count');
+}
+document.addEventListener('input', (event) => {
+  if (event.target.matches('input[name^="vagalala-"]')) updateVagalalaTotals();
+});
+document.addEventListener('change', (event) => {
+  if (event.target.matches('input[name^="vagalala-"]')) updateVagalalaTotals();
+});
+updateVagalalaTotals();
 </script>
 {% endblock %}

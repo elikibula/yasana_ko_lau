@@ -1,10 +1,11 @@
 from datetime import date
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import BusinessTraining, TNKReport, VillageCommittee
+from .models import BusinessTraining, TNKApprovalAction, TNKReport, VillageCommittee
 
 
 class ReportOwnershipTests(TestCase):
@@ -22,6 +23,23 @@ class ReportOwnershipTests(TestCase):
         profile.district = "Lakeba"
         profile.province = "Lau"
         profile.save()
+        return user
+
+    def make_mata(self, username, district="Lakeba"):
+        user = get_user_model().objects.create_user(
+            username=username,
+            password="StrongPass123!",
+            first_name=username.title(),
+            last_name="Mata",
+        )
+        profile = user.turaga_profile
+        profile.membership_type = "mata_ni_tikina"
+        profile.date_of_birth = date(1980, 1, 1)
+        profile.village = "Tubou"
+        profile.district = district
+        profile.province = "Lau"
+        profile.save()
+        Group.objects.get_or_create(name="mata_ni_tikina")[0].user_set.add(user)
         return user
 
     def empty_formset_data(self):
@@ -222,5 +240,119 @@ class ReportOwnershipTests(TestCase):
         self.assertRedirects(response, reverse("turani:report_detail", args=[report.pk]))
         self.assertEqual(report.status, TNKReport.STATUS_SUBMITTED)
         self.assertIsNotNone(report.submitted_at)
+        self.assertEqual(report.approval_actions.filter(action_type=TNKApprovalAction.ACTION_SUBMIT).count(), 1)
+
+    def test_turaga_cannot_edit_report_under_review(self):
+        user = self.make_turaga("jone", "Tubou")
+        report = TNKReport.objects.create(
+            owner=user,
+            quarter="Q1",
+            year=2026,
+            village="Tubou",
+            district="Lakeba",
+            province="Lau",
+            village_headman_name="Jone Turaga",
+            status=TNKReport.STATUS_SUBMITTED_TO_MATA,
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("turani:report_edit", args=[report.pk]))
+
+        self.assertRedirects(response, reverse("turani:report_detail", args=[report.pk]))
+
+    def test_mata_cannot_approve_report_outside_tikina(self):
+        owner = self.make_turaga("jone", "Tubou")
+        mata = self.make_mata("mata", district="Moce")
+        report = TNKReport.objects.create(
+            owner=owner,
+            quarter="Q1",
+            year=2026,
+            village="Tubou",
+            district="Lakeba",
+            province="Lau",
+            village_headman_name="Jone Turaga",
+            status=TNKReport.STATUS_SUBMITTED_TO_MATA,
+        )
+        self.client.force_login(mata)
+
+        response = self.client.post(
+            reverse("turani:report_approve", args=[report.pk]),
+            {"acknowledge": "on", "comment": "Reviewed"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        report.refresh_from_db()
+        self.assertEqual(report.status, TNKReport.STATUS_SUBMITTED_TO_MATA)
+
+    def test_roko_cannot_final_approve_draft_report(self):
+        owner = self.make_turaga("jone", "Tubou")
+        roko = get_user_model().objects.create_user("roko", password="StrongPass123!")
+        Group.objects.get_or_create(name="roko_admin")[0].user_set.add(roko)
+        report = TNKReport.objects.create(
+            owner=owner,
+            quarter="Q1",
+            year=2026,
+            village="Tubou",
+            district="Lakeba",
+            province="Lau",
+            village_headman_name="Jone Turaga",
+            status=TNKReport.STATUS_DRAFT,
+        )
+        self.client.force_login(roko)
+
+        response = self.client.post(
+            reverse("turani:report_final_approve", args=[report.pk]),
+            {"acknowledge": "on", "comment": "Final approval"},
+        )
+
+        self.assertRedirects(response, reverse("turani:report_detail", args=[report.pk]))
+        report.refresh_from_db()
+        self.assertEqual(report.status, TNKReport.STATUS_DRAFT)
+
+    def test_mata_approval_records_audit_action_and_escalates(self):
+        owner = self.make_turaga("jone", "Tubou")
+        mata = self.make_mata("mata")
+        report = TNKReport.objects.create(
+            owner=owner,
+            quarter="Q1",
+            year=2026,
+            village="Tubou",
+            district="Lakeba",
+            province="Lau",
+            village_headman_name="Jone Turaga",
+            status=TNKReport.STATUS_SUBMITTED_TO_MATA,
+        )
+        self.client.force_login(mata)
+
+        response = self.client.post(
+            reverse("turani:report_approve", args=[report.pk]),
+            {"acknowledge": "on", "comment": "Approved for Yavusa review"},
+        )
+
+        self.assertRedirects(response, reverse("turani:report_detail", args=[report.pk]))
+        report.refresh_from_db()
+        self.assertEqual(report.status, TNKReport.STATUS_SUBMITTED_TO_LIULIU)
+        action = report.approval_actions.get(action_type=TNKApprovalAction.ACTION_APPROVE)
+        self.assertEqual(action.user_full_name, "Mata Mata")
+        self.assertIn("Approved for Yavusa review", action.comment)
+
+    def test_report_exports_as_pdf(self):
+        user = self.make_turaga("jone", "Tubou")
+        report = TNKReport.objects.create(
+            owner=user,
+            quarter="Q1",
+            year=2026,
+            village="Tubou",
+            district="Lakeba",
+            province="Lau",
+            village_headman_name="Jone Turaga",
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("turani:report_pdf", args=[report.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/pdf")
+        self.assertTrue(response.content.startswith(b"%PDF"))
 
 # Create your tests here.

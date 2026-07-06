@@ -9,11 +9,13 @@ from .models import TuragaProfile, UserProfile
 
 
 GROUP_DASHBOARD_MAP = {
-    "turaga_ni_koro": "/dashboard/koro/",
+    "turaga_ni_koro": "/turani/dashboard/turaga-ni-koro/",
     "mata_ni_tikina": "/mata-ni-tikina/dashboard/",
     "liuliu_ni_yavusa": "/turaga-ni-yavusa/dashboard/",
     "roko_admin": "/dashboard/admin/",
 }
+
+ROLE_GROUP_NAMES = tuple(GROUP_DASHBOARD_MAP)
 
 LEGACY_MEMBERSHIP_GROUP_MAP = {
     TuragaProfile.TURAGA_NI_KORO: "turaga_ni_koro",
@@ -28,6 +30,7 @@ def sync_user_role(user, group_name):
     from tikina.models import Tikina
 
     group, _ = Group.objects.get_or_create(name=group_name)
+    user.groups.remove(*Group.objects.filter(name__in=ROLE_GROUP_NAMES).exclude(name=group_name))
     user.groups.add(group)
     legacy_profile = getattr(user, "turaga_profile", None)
     profile_defaults = {"role": group_name}
@@ -94,15 +97,22 @@ def profile(request):
 
 @login_required
 def dashboard_redirect(request):
-    groups = set(request.user.groups.values_list("name", flat=True))
-    for group_name, dashboard_url in GROUP_DASHBOARD_MAP.items():
-        if group_name in groups:
-            return redirect(sync_user_role(request.user, group_name))
     user_profile, _ = TuragaProfile.objects.get_or_create(user=request.user)
     if request.user.is_staff:
         return redirect(sync_user_role(request.user, "roko_admin"))
+
+    assigned_profile = getattr(request.user, "user_profile", None)
+    if assigned_profile and assigned_profile.role in GROUP_DASHBOARD_MAP:
+        return redirect(sync_user_role(request.user, assigned_profile.role))
+
     legacy_group = LEGACY_MEMBERSHIP_GROUP_MAP.get(user_profile.membership_type)
     if legacy_group:
         return redirect(sync_user_role(request.user, legacy_group))
+
+    groups = set(request.user.groups.values_list("name", flat=True))
+    for group_name in GROUP_DASHBOARD_MAP:
+        if group_name in groups:
+            return redirect(sync_user_role(request.user, group_name))
+
     messages.warning(request, "Your reporting role is not assigned yet. Please contact the Provincial Office administrator.")
     return render(request, "dashboard/generic.html", {"legacy_profile": user_profile})

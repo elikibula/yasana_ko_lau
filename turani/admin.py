@@ -16,6 +16,7 @@ from .models import (
     LawOffence,
     PopulationAgeGroup,
     Signature,
+    TNKApprovalAction,
     TNKReport,
     ToiletType,
     TraditionalTitleStatus,
@@ -59,6 +60,28 @@ class CulturalKnowledgeInline(admin.TabularInline): model = CulturalKnowledge; e
 class SignatureInline(admin.TabularInline): model = Signature; extra = 0
 
 
+class ApprovalActionInline(admin.TabularInline):
+    model = TNKApprovalAction
+    extra = 0
+    can_delete = False
+    readonly_fields = [
+        "user",
+        "user_full_name",
+        "user_role",
+        "action_type",
+        "from_status",
+        "to_status",
+        "comment",
+        "digital_acknowledgement",
+        "ip_address",
+        "user_agent",
+        "created_at",
+    ]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(TNKReport)
 class TNKReportAdmin(admin.ModelAdmin):
     list_display = ["village", "district", "quarter", "year", "status", "submitted_at", "household_count", "village_meetings_count", "created_at"]
@@ -72,5 +95,32 @@ class TNKReportAdmin(admin.ModelAdmin):
         TrainingInline, HealthConditionCountInline, DisabilityCountInline, CropCountInline,
         IVDPProjectInline, IVDPImplementationScheduleInline, BusinessTrainingInline, BusinessInline, VillageAssetSavingInline,
         EvacuationCentreMaterialInline, TraditionalTitleStatusInline, CulturalKnowledgeInline,
-        SignatureInline, WasteManagementInline,
+        SignatureInline, ApprovalActionInline, WasteManagementInline,
     ]
+
+
+@admin.register(TNKApprovalAction)
+class TNKApprovalActionAdmin(admin.ModelAdmin):
+    list_display = ["report", "action_type", "user_full_name", "user_role", "from_status", "to_status", "created_at"]
+    list_filter = ["action_type", "user_role", "created_at"]
+    search_fields = ["report__village", "report__district", "user_full_name", "comment"]
+    readonly_fields = [
+        "report",
+        "user",
+        "user_full_name",
+        "user_role",
+        "action_type",
+        "from_status",
+        "to_status",
+        "comment",
+        "digital_acknowledgement",
+        "ip_address",
+        "user_agent",
+        "created_at",
+    ]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

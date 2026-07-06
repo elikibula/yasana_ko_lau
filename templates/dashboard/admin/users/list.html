@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}User Management | Roko Admin{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 py-8">
+  <div class="grid gap-5 md:grid-cols-[260px_1fr]">
+    {% include "partials/sidebar_admin.html" %}
+    <div class="min-w-0 space-y-6">
+      <div class="masi-card-accent rounded-md bg-lau-white p-6 shadow-sm">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase text-lau-earth">Roko Admin</p>
+            <h1 class="mt-2 font-display text-3xl text-lau-navy">User Management</h1>
+          </div>
+          <a href="{% url 'admin_panel:user_create' %}" class="rounded-md bg-lau-gold px-4 py-3 text-sm font-semibold text-lau-navy">Create user</a>
+        </div>
+      </div>
+
+      <form method="get" class="rounded-md bg-lau-white p-4 shadow-sm">
+        <div class="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+          <select name="role" class="lau-input">
+            <option value="">All roles</option>
+            <option value="turaga_ni_koro" {% if active_role == "turaga_ni_koro" %}selected{% endif %}>Turaga ni Koro</option>
+            <option value="mata_ni_tikina" {% if active_role == "mata_ni_tikina" %}selected{% endif %}>Mata ni Tikina</option>
+            <option value="liuliu_ni_yavusa" {% if active_role == "liuliu_ni_yavusa" %}selected{% endif %}>Liuliu ni Yavusa</option>
+            <option value="roko_admin" {% if active_role == "roko_admin" %}selected{% endif %}>Roko Admin</option>
+          </select>
+          <select name="status" class="lau-input">
+            <option value="">All statuses</option>
+            <option value="active" {% if active_status == "active" %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if active_status == "inactive" %}selected{% endif %}>Inactive</option>
+          </select>
+          <button type="submit" class="rounded-md bg-lau-navy px-5 py-3 text-sm font-semibold text-lau-gold">Filter</button>
+        </div>
+      </form>
+
+      <div class="overflow-x-auto rounded-md bg-lau-white shadow-sm">
+        <table class="min-w-full text-left text-sm">
+          <thead class="bg-lau-navy text-lau-cream">
+            <tr><th class="px-4 py-3">Name</th><th class="px-4 py-3">Username</th><th class="px-4 py-3">Role</th><th class="px-4 py-3">Area</th><th class="px-4 py-3">Status</th><th class="px-4 py-3 text-right">Actions</th></tr>
+          </thead>
+          <tbody class="divide-y divide-lau-cream">
+            {% for user in users %}
+              <tr>
+                <td class="px-4 py-3 font-semibold text-lau-navy">{{ user.get_full_name|default:user.username }}</td>
+                <td class="px-4 py-3">{{ user.username }}</td>
+                <td class="px-4 py-3">{{ user.user_profile.display_role|default:user.turaga_profile.get_membership_type_display }}</td>
+                <td class="px-4 py-3">{{ user.turaga_profile.village|default:user.turaga_profile.district|default:user.turaga_profile.yavusa|default:"-" }}</td>
+                <td class="px-4 py-3">{% if user.is_active %}Active{% else %}Inactive{% endif %}</td>
+                <td class="px-4 py-3 text-right">
+                  <a class="font-semibold text-lau-earth" href="{% url 'admin_panel:user_edit' user.pk %}">Edit</a>
+                  <span class="text-lau-muted"> / </span><a class="font-semibold text-lau-earth" href="{% url 'admin_panel:user_reset_password' user.pk %}">Reset Password</a>
+                  {% if user.pk != request.user.pk %}
+                    <span class="text-lau-muted"> / </span><a class="font-semibold text-red-700" href="{% url 'admin_panel:user_delete' user.pk %}">Delete</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="px-4 py-8 text-center text-lau-muted">No users found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

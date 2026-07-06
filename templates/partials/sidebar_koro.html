@@ -1,9 +1,84 @@
-<aside class="rounded-md bg-lau-navy p-3 text-lau-cream md:sticky md:top-4">
-  <nav class="grid gap-1 text-sm font-semibold">
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'turaga_dashboard' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:turaga_dashboard' %}">Dashboard</a>
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'accounts' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'accounts:profile' %}">Tukutuku baleji Au</a>
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:report_create' %}">Vola vou dua qou Ripote</a>
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'report_list' or request.resolver_match.url_name == 'report_detail' or request.resolver_match.url_name == 'report_edit' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:report_list' %}">List ni qou Ripote</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'public:contact' %}">Help &amp; Contact</a>
+<aside class="rounded-xl bg-lau-navy p-4 text-lau-cream shadow-lg md:sticky md:top-4">
+
+  <div class="mb-4 border-b border-lau-gold/20 pb-3">
+    <h2 class="font-display text-lg text-lau-gold">
+      Turaga ni Koro
+    </h2>
+    <p class="text-xs text-lau-cream/70">
+      Dashboard Navigation
+    </p>
+  </div>
+
+  <nav class="grid gap-2 text-sm font-semibold">
+
+    <!-- Dashboard -->
+    <a
+      href="{% url 'turani:turaga_dashboard' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'turaga_dashboard' %}
+        bg-white/10 text-lau-gold shadow
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <!-- My Profile -->
+    <a
+      href="{% url 'accounts:profile' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'accounts' %}
+        bg-white/10 text-lau-gold shadow
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-id-card w-5 text-center"></i>
+      <span>Tukutuku baleti Au</span>
+    </a>
+
+    <!-- Create Report -->
+    <a
+      href="{% url 'turani:report_create' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'report_create' %}
+        bg-white/10 text-lau-gold shadow
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-file-circle-plus w-5 text-center"></i>
+      <span>Vola Vou dua Qou Ripote</span>
+    </a>
+
+    <!-- Report List -->
+    <a
+      href="{% url 'turani:report_list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'turani' and request.resolver_match.url_name == 'report_list' or request.resolver_match.url_name == 'report_detail' or request.resolver_match.url_name == 'report_edit' %}
+        bg-white/10 text-lau-gold shadow
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-folder-open w-5 text-center"></i>
+      <span>List ni Qou Ripote</span>
+    </a>
+
+    <!-- Downloads -->
+    <a
+      href="{% url 'documents:list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200 hover:bg-white/10 hover:text-lau-gold">
+      <i class="fa-solid fa-download w-5 text-center"></i>
+      <span>Downloads</span>
+    </a>
+
+    <!-- Help -->
+    <a
+      href="{% url 'public:contact' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200 hover:bg-white/10 hover:text-lau-gold">
+      <i class="fa-solid fa-circle-question w-5 text-center"></i>
+      <span>Help &amp; Contact</span>
+    </a>
+
   </nav>
+
 </aside>

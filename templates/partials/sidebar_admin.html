@@ -1,14 +1,130 @@
-<aside class="rounded-md bg-lau-navy p-3 text-lau-cream md:sticky md:top-4">
-  <nav class="grid gap-1 text-sm font-semibold">
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'admin_panel' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'admin_panel:dashboard' %}">Overview</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'turani:report_list' %}">All Koro Reports</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'mata_ni_tikina:report_list' %}">All Tikina Reports</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'turaga_ni_yavusa:report_list' %}">All Yavusa Reports</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'admin:auth_user_changelist' %}">User Management</a>
-    <div class="px-3 pb-1 pt-4 text-xs uppercase tracking-wide text-lau-gold">Content Management</div>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'news:manage' %}">News Posts</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'events:manage' %}">Events</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'documents:manage' %}">Documents</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'admin:index' %}">System Settings</a>
+<aside class="rounded-xl bg-lau-navy p-4 text-lau-cream shadow-lg md:sticky md:top-4">
+
+  <div class="mb-4 border-b border-lau-gold/30 pb-3">
+    <h2 class="font-display text-lg text-lau-gold">
+      Administrator
+    </h2>
+    <p class="mt-1 text-xs text-lau-cream/70">
+      Navigation Menu
+    </p>
+  </div>
+
+  <nav class="grid gap-2 text-sm font-semibold">
+
+    <!-- Dashboard -->
+    <a
+      href="{% url 'admin_panel:dashboard' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'admin_panel' %}
+        bg-lau-gold text-lau-navy shadow-md
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+      <span>Overview</span>
+    </a>
+
+    <!-- Koro Reports -->
+    <a
+      href="{% url 'turani:report_list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-house w-5 text-center"></i>
+      <span>All Koro Reports</span>
+    </a>
+
+    <!-- Tikina Reports -->
+    <a
+      href="{% url 'mata_ni_tikina:report_list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-map-location-dot w-5 text-center"></i>
+      <span>All Tikina Reports</span>
+    </a>
+
+    <!-- Yavusa Reports -->
+    <a
+      href="{% url 'turaga_ni_yavusa:report_list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-people-group w-5 text-center"></i>
+      <span>All Yavusa Reports</span>
+    </a>
+
+    <div class="mt-3 border-t border-lau-gold/20 pt-4 text-xs font-bold uppercase tracking-widest text-lau-gold">
+      Enter Hardcopy
+    </div>
+
+    <!-- TNK Report -->
+    <a
+      href="{% url 'turani:report_create' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-file-circle-plus w-5 text-center"></i>
+      <span>Turaga ni Koro Report</span>
+    </a>
+
+    <!-- Tikina Report -->
+    <a
+      href="{% url 'mata_ni_tikina:report_create' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-file-circle-plus w-5 text-center"></i>
+      <span>Mata ni Tikina Report</span>
+    </a>
+
+    <!-- Yavusa Report -->
+    <a
+      href="{% url 'turaga_ni_yavusa:report_create' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-file-circle-plus w-5 text-center"></i>
+      <span>Turaga ni Yavusa Report</span>
+    </a>
+
+    <!-- User Management -->
+    <a
+      href="{% url 'admin_panel:user_list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.url_name == 'user_list' or request.resolver_match.url_name == 'user_create' or request.resolver_match.url_name == 'user_edit' %}
+        bg-white/10 text-lau-gold
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-users-gear w-5 text-center"></i>
+      <span>User Management</span>
+    </a>
+
+    <div class="mt-3 border-t border-lau-gold/20 pt-4 text-xs font-bold uppercase tracking-widest text-lau-gold">
+      Content Management
+    </div>
+
+    <!-- News -->
+    <a
+      href="{% url 'news:manage' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-newspaper w-5 text-center"></i>
+      <span>News Posts</span>
+    </a>
+
+    <!-- Events -->
+    <a
+      href="{% url 'events:manage' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-calendar-days w-5 text-center"></i>
+      <span>Events</span>
+    </a>
+
+    <!-- Documents -->
+    <a
+      href="{% url 'documents:manage' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 hover:bg-white/10 hover:text-lau-gold transition">
+      <i class="fa-solid fa-folder-tree w-5 text-center"></i>
+      <span>Documents</span>
+    </a>
+
+    <!-- Downloads -->
+    <a
+      href="{% url 'documents:list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200 hover:bg-white/10 hover:text-lau-gold">
+      <i class="fa-solid fa-download w-5 text-center"></i>
+      <span>Downloads</span>
+    </a>
+
   </nav>
+
 </aside>

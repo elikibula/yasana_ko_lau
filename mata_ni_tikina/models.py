@@ -2,15 +2,16 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+from common.reporting_periods import (
+    QUARTER_CHOICES,
+    is_report_overdue,
+    reporting_due_date,
+)
+
 
 class MNTReport(models.Model):
     YES_NO = (("io", "Io"), ("sega", "Sega"))
-    QUARTERS = (
-        ("Q1", "Q1 - January to March"),
-        ("Q2", "Q2 - April to June"),
-        ("Q3", "Q3 - July to September"),
-        ("Q4", "Q4 - October to December"),
-    )
+    QUARTERS = QUARTER_CHOICES
     TREND_CHOICES = (
         ("tubucake", "Tubucake"),
         ("rawa_vakatikina", "Rawa Vakatikina"),
@@ -22,8 +23,18 @@ class MNTReport(models.Model):
         ("leqa_levu", "Leqa Vakalevu"),
     )
     STATUS_DRAFT = "draft"
-    STATUS_SUBMITTED = "submitted"
-    STATUS_CHOICES = ((STATUS_DRAFT, "Draft"), (STATUS_SUBMITTED, "Submitted"))
+    STATUS_SUBMITTED_TO_ROKO = "submitted"
+    STATUS_APPROVED_BY_ROKO = "approved_roko"
+    STATUS_RETURNED_BY_ROKO = "returned_roko"
+    STATUS_REJECTED_BY_ROKO = "rejected_roko"
+    STATUS_SUBMITTED = STATUS_SUBMITTED_TO_ROKO
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, "Draft"),
+        (STATUS_SUBMITTED_TO_ROKO, "Submitted to Roko Tui"),
+        (STATUS_APPROVED_BY_ROKO, "Approved by Roko Tui"),
+        (STATUS_RETURNED_BY_ROKO, "Returned by Roko Tui"),
+        (STATUS_REJECTED_BY_ROKO, "Rejected by Roko Tui"),
+    )
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="mnt_reports", null=True, blank=True)
     quarter = models.CharField(max_length=2, choices=QUARTERS)
@@ -34,20 +45,24 @@ class MNTReport(models.Model):
     tikina = models.CharField(max_length=150)
     province = models.CharField(max_length=150)
     tikina_population = models.PositiveIntegerField(default=0)
-    announcements_made_count = models.PositiveIntegerField(default=0)
-    traditional_announcements_received_count = models.PositiveIntegerField(default=0)
+    announcements_made_count = models.TextField(blank=True)
+    traditional_announcements_received_count = models.TextField(blank=True)
+    vagalala_population_total = models.PositiveIntegerField(default=0)
+    vagalala_family_total = models.PositiveIntegerField(default=0)
     villages_surveyed_count = models.PositiveIntegerField(default=0)
     villages_pending_survey_count = models.PositiveIntegerField(default=0)
-    council_head_name = models.CharField(max_length=150)
-    council_head_age = models.PositiveIntegerField(null=True, blank=True)
+    council_head_name = models.CharField(max_length=150, blank=True)
+    council_head_age = models.CharField(max_length=50, null=True, blank=True)
     council_turaga_count = models.PositiveIntegerField(default=0)
     council_marama_count = models.PositiveIntegerField(default=0)
     council_daunivakasala_count = models.PositiveIntegerField(default=0)
+    council_total_attendees = models.PositiveIntegerField(default=0)
     council_meeting_frequency = models.CharField(max_length=150, blank=True)
     council_additional_notes = models.TextField(blank=True)
     coordination_additional_notes = models.TextField(blank=True)
     has_development_plan = models.CharField(max_length=10, choices=YES_NO, blank=True)
     education_council_decision = models.TextField(blank=True)
+    education_next_quarter_decision = models.TextField(blank=True)
     income_trend = models.CharField(max_length=20, choices=TREND_CHOICES, blank=True)
     income_council_decision = models.TextField(blank=True)
     infrastructure_trend = models.CharField(max_length=20, choices=TREND_CHOICES, blank=True)
@@ -97,12 +112,20 @@ class MNTReport(models.Model):
         constraints = [models.UniqueConstraint(fields=["owner", "quarter", "year"], name="one_mnt_report_per_owner_quarter")]
 
     def submit(self):
-        self.status = self.STATUS_SUBMITTED
+        self.status = self.STATUS_SUBMITTED_TO_ROKO
         if not self.submitted_at:
             self.submitted_at = timezone.now()
 
+    @property
+    def due_date(self):
+        return reporting_due_date(self.quarter, self.year)
+
+    @property
+    def is_overdue(self):
+        return is_report_overdue(self)
+
     def total_villages_under_buli(self):
-        return self.koro_under_tikina.count()
+        return self.koro_under_tikina.filter(installed="io").count()
 
     def total_disputes(self):
         return self.disputes.count()
@@ -111,16 +134,55 @@ class MNTReport(models.Model):
         return f"{self.tikina} - {self.quarter} {self.year}"
 
 
+class MNTApprovalAction(models.Model):
+    ACTION_SUBMIT = "submit"
+    ACTION_APPROVE = "approve"
+    ACTION_RETURN = "return"
+    ACTION_REJECT = "reject"
+    ACTION_COMMENT = "comment"
+    ACTION_CHOICES = (
+        (ACTION_SUBMIT, "Submit"),
+        (ACTION_APPROVE, "Approve"),
+        (ACTION_RETURN, "Return"),
+        (ACTION_REJECT, "Reject"),
+        (ACTION_COMMENT, "Comment"),
+    )
+
+    report = models.ForeignKey(MNTReport, on_delete=models.PROTECT, related_name="approval_actions")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="mnt_approval_actions")
+    user_full_name = models.CharField(max_length=150)
+    user_role = models.CharField(max_length=100)
+    action_type = models.CharField(max_length=30, choices=ACTION_CHOICES)
+    from_status = models.CharField(max_length=40, blank=True)
+    to_status = models.CharField(max_length=40, blank=True)
+    comment = models.TextField(blank=True)
+    digital_acknowledgement = models.TextField()
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "pk"]
+        verbose_name = "Mata ni Tikina Approval Action"
+        verbose_name_plural = "Mata ni Tikina Approval Actions"
+
+    def __str__(self):
+        return f"{self.report} - {self.get_action_type_display()} by {self.user_full_name}"
+
+
 class KoroUnderTikina(models.Model):
     report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="koro_under_tikina")
     village_name = models.CharField(max_length=150)
     traditional_leader = models.CharField(max_length=150, blank=True)
+    installed = models.CharField(max_length=10, choices=MNTReport.YES_NO, blank=True)
 
 
 class VagalalaSettlement(models.Model):
     report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="vagalala_settlements")
     settlement_name = models.CharField(max_length=150)
     household_head = models.CharField(max_length=150, blank=True)
+    population_count = models.PositiveIntegerField(default=0)
+    family_count = models.PositiveIntegerField(default=0)
 
 
 class SettlementRegistrationRequest(models.Model):
@@ -133,10 +195,10 @@ class SettlementRegistrationRequest(models.Model):
 
 class TikinaCoordinationStatus(models.Model):
     ENTITY_CHOICES = (
-        ("yavusa_leadership", "Yavusa Leadership"),
-        ("mataqali_leadership", "Mataqali Leadership"),
-        ("church_leadership", "Church Leadership"),
-        ("organization_leadership", "Organization Leadership"),
+        ("yavusa_leadership", "Liuliu ni Yavusa"),
+        ("mataqali_leadership", "Liuliu ni Mataqali"),
+        ("church_leadership", "Liuliu ni Veimata Lotu"),
+        ("organization_leadership", "Liuliu ni Veimata Soqosoqo"),
     )
     report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="coordination_statuses")
     entity = models.CharField(max_length=50, choices=ENTITY_CHOICES)
@@ -151,25 +213,33 @@ class TikinaDispute(models.Model):
 
 class TikinaSocialIndicator(models.Model):
     INDICATOR_CHOICES = (
-        ("spiritual_life", "Spiritual Life"),
-        ("traditional_custom", "Traditional Custom"),
-        ("drinking_water", "Drinking Water"),
-        ("food_supply", "Food Supply"),
-        ("child_welfare_support", "Child Welfare Support"),
-        ("education", "Education"),
+        ("spiritual_life", "Bula Vakayalo"),
+        ("traditional_custom", "Tovo Vakavanua"),
+        ("drinking_water", "Wai ni gunu"),
+        ("food_supply", "Kakana"),
+        ("child_welfare_support", "Vukei na Yada kei na Gone luveniyali"),
+        ("education", "Na Vuli"),
     )
     report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="social_indicators")
     indicator = models.CharField(max_length=50, choices=INDICATOR_CHOICES)
     trend = models.CharField(max_length=20, choices=MNTReport.TREND_CHOICES, blank=True)
 
 
+class TikinaEducationTraining(models.Model):
+    report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="education_trainings")
+    training_type = models.CharField(max_length=200)
+    training_leader = models.CharField(max_length=150, blank=True)
+    participants_count = models.PositiveIntegerField(default=0)
+    benefit = models.TextField(blank=True)
+
+
 class IncomeSourceItem(models.Model):
     CATEGORY_CHOICES = (
-        ("business", "Business"),
-        ("farming", "Farming"),
-        ("fishing", "Fishing"),
-        ("forest_land_use", "Forest/Land Use"),
-        ("handicrafts", "Handicrafts"),
+        ("business", "Cicivaki Bisinisi"),
+        ("farming", "Commercial Farm"),
+        ("fishing", "Commercial Fishing"),
+        ("forest_land_use", "Forestry and other Land Use"),
+        ("handicrafts", "Bisinisi ni Handicrafts"),
     )
     report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="income_sources")
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
@@ -226,6 +296,7 @@ class CouncilSavingsAccount(models.Model):
         ("vaka_tamata_yadua", "Vaka Tamata Yadua"),
     )
     report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="savings_accounts")
+    funds_held = models.CharField(max_length=10, choices=MNTReport.YES_NO, blank=True)
     bank = models.CharField(max_length=50, choices=BANK_CHOICES)
     saving_level = models.CharField(max_length=50, choices=SAVING_LEVEL_CHOICES)
     account_number = models.CharField(max_length=100, blank=True)
@@ -234,11 +305,11 @@ class CouncilSavingsAccount(models.Model):
 
 class FundCollectionChallenge(models.Model):
     CHALLENGE_CHOICES = (
-        ("road_access", "Road Access"),
-        ("no_market", "No Market"),
-        ("no_boat_or_lorry", "No Boat/Lorry"),
-        ("low_produce_price", "Low Produce Price"),
-        ("low_value_goods", "Low Value Goods"),
+        ("road_access", "Dredre na gaunisala"),
+        ("no_market", "Sega na makete ni volivolitaki"),
+        ("no_boat_or_lorry", "Sega se Dredre na waqa se lori"),
+        ("low_produce_price", "Sau ca nai voli"),
+        ("low_value_goods", "Lailai nai yau ni veivoli"),
     )
     report = models.ForeignKey(MNTReport, on_delete=models.CASCADE, related_name="fund_challenges")
     challenge = models.CharField(max_length=50, choices=CHALLENGE_CHOICES)

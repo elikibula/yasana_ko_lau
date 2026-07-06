@@ -255,6 +255,19 @@ class TNKReportForm(StyledModelFormMixin, forms.ModelForm):
         }
 
 
+class ApprovalActionForm(forms.Form):
+    comment = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={"class": AREA, "rows": 3}),
+        label="Comment",
+    )
+    acknowledge = forms.BooleanField(
+        required=True,
+        label="I confirm this digital acknowledgement.",
+        widget=forms.CheckboxInput(attrs={"class": CHECKBOX}),
+    )
+
+
 class WasteManagementForm(StyledModelFormMixin, forms.ModelForm):
     class Meta:
         model = WasteManagement

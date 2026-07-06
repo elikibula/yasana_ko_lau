@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 {% load humanize %}
 
-{% block title %}{{ report.village }} | TNK{% endblock %}
+{% block title %}{{ report.village }} | TNK Report{% endblock %}
 
 {% block content %}
 <section class="bg-lau-navy text-lau-cream">
   <div class="mx-auto max-w-6xl px-4 py-10">
     <p class="text-sm font-semibold uppercase text-lau-gold">{{ report.quarter }} {{ report.year }}</p>
     <h1 class="mt-2 font-display text-4xl text-lau-gold">{{ report.village }}</h1>
-    <p class="mt-3 text-sm">{{ report.district }} &middot; {{ report.province }} &middot; {{ report.get_status_display }}{% if report.submitted_at %} &middot; Submitted {{ report.submitted_at|date:"d M Y" }}{% endif %}</p>
-    {% if report.status == "draft" and not is_roko_user %}
+    <p class="mt-3 text-sm">{{ report.district }} &middot; {{ report.province }}{% if report.submitted_at %} &middot; Submitted {{ report.submitted_at|date:"d M Y" }}{% endif %}</p>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <span class="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-lau-gold">{{ report.get_status_display }}</span>
+      <span class="rounded-full bg-white/10 px-4 py-2 text-sm">Submitted by {{ report.owner.get_full_name|default:report.owner.username }}</span>
+      {% if report.is_locked %}<span class="rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-800">Locked</span>{% else %}<span class="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-800">Editable</span>{% endif %}
+    </div>
+    {% if is_roko_user or report.status == "final_approved" %}
+      <a href="{% url 'turani:report_pdf' report.pk %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">Export PDF</a>
+    {% endif %}
+    {% if can_edit_report %}
       <a href="{% url 'turani:report_edit' report.pk %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">Edit Draft</a>
     {% endif %}
   </div>
@@ -24,6 +32,61 @@
         <p class="mt-2 text-3xl font-bold text-lau-navy">{{ value|intcomma }}</p>
       </div>
     {% endfor %}
+  </div>
+
+  <div class="mb-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+    <section class="rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Approval Workflow</p>
+          <h2 class="font-display text-2xl text-lau-navy">Actions</h2>
+        </div>
+        <a href="{% url 'turani:approval_timeline' report.pk %}" class="rounded-md bg-lau-cream px-4 py-2 text-sm font-semibold text-lau-navy">Timeline</a>
+      </div>
+      {% if workflow_actions %}
+        <div class="mt-4 grid gap-4">
+          {% for action in workflow_actions %}
+            <form method="post"
+                  action="{% if action.type == 'approve' %}{% url 'turani:report_approve' report.pk %}{% elif action.type == 'return' %}{% url 'turani:report_return' report.pk %}{% elif action.type == 'reject' %}{% url 'turani:report_reject' report.pk %}{% elif action.type == 'recommend' %}{% url 'turani:report_recommend' report.pk %}{% elif action.type == 'final_approve' %}{% url 'turani:report_final_approve' report.pk %}{% elif action.type == 'archive' %}{% url 'turani:report_archive' report.pk %}{% else %}{% url 'turani:report_comment' report.pk %}{% endif %}"
+                  class="rounded-md border border-lau-navy/10 bg-lau-cream/50 p-4">
+              {% csrf_token %}
+              <label class="block text-sm font-semibold text-lau-navy">Comment
+                <textarea name="comment" rows="3" class="mt-1 w-full rounded border border-lau-navy/30 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-lau-gold"></textarea>
+              </label>
+              <label class="mt-3 flex items-start gap-2 text-sm text-lau-navy">
+                <input type="checkbox" name="acknowledge" required class="mt-1 h-4 w-4 rounded border-lau-navy/30 text-lau-gold focus:ring-lau-gold">
+                <span>I confirm that I have reviewed this report and intentionally performed this action.</span>
+              </label>
+              <button type="submit" class="mt-3 rounded-md {% if action.type == 'reject' %}bg-red-700 text-white{% elif action.type == 'return' %}bg-yellow-600 text-white{% else %}bg-lau-gold text-lau-navy{% endif %} px-4 py-2 text-sm font-semibold">
+                {{ action.label }}
+              </button>
+            </form>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="mt-4 rounded-md border border-dashed border-lau-navy/20 p-4 text-sm text-lau-muted">No workflow actions are available for your role at this stage.</p>
+      {% endif %}
+    </section>
+
+    <section class="rounded-md bg-lau-white p-5 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Audit Trail</p>
+      <h2 class="font-display text-2xl text-lau-navy">Comments and Timeline</h2>
+      <ol class="mt-4 space-y-3">
+        {% for item in approval_actions %}
+          <li class="rounded-md border border-lau-navy/10 p-4">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <p class="font-semibold text-lau-navy">{{ item.user_full_name }} &middot; {{ item.user_role }}</p>
+              <p class="text-xs text-lau-muted">{{ item.created_at|date:"d M Y H:i" }}</p>
+            </div>
+            <p class="mt-1 text-sm font-semibold text-lau-earth">{{ item.get_action_type_display }}{% if item.to_status %}: {{ item.to_status }}{% endif %}</p>
+            {% if item.comment %}<p class="mt-2 text-sm leading-6 text-lau-muted">{{ item.comment }}</p>{% endif %}
+            <p class="mt-2 text-xs leading-5 text-lau-muted">{{ item.digital_acknowledgement }}</p>
+          </li>
+        {% empty %}
+          <li class="rounded-md border border-dashed border-lau-navy/20 p-4 text-sm text-lau-muted">No approval actions have been recorded yet.</li>
+        {% endfor %}
+      </ol>
+    </section>
   </div>
 
   <div class="space-y-6">

@@ -1,12 +1,17 @@
 from collections import OrderedDict
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from accounts.decorators import is_roko_user, membership_required
 from accounts.models import TuragaProfile
+from accounts.reporting import resolve_report_owner
+from common.pdf_exports import report_pdf_response
 
 from .analytics import tnk_dashboard_analysis
 from .forms import (
@@ -20,6 +25,7 @@ from .forms import (
     DisabilityFormSet,
     ElectricityFormSet,
     EvacuationMaterialFormSet,
+    FIJIAN_INLINE_LABELS,
     HealthConditionFormSet,
     HousingFormSet,
     IVDPProjectFormSet,
@@ -27,6 +33,7 @@ from .forms import (
     LawOffenceFormSet,
     MeetingDecisionFormSet,
     PopulationFormSet,
+    ApprovalActionForm,
     TNK_SECTIONS,
     TNKReportForm,
     ToiletTypeFormSet,
@@ -49,6 +56,7 @@ from .models import (
     IVDPProject,
     LawOffence,
     PopulationAgeGroup,
+    TNKApprovalAction,
     TNKReport,
     ToiletType,
     TraditionalTitleStatus,
@@ -57,6 +65,14 @@ from .models import (
     WasteManagement,
     WaterCommitteeQuestion,
     WaterSource,
+)
+from .workflow import (
+    allowed_actions,
+    can_edit_report,
+    can_view_report,
+    record_action,
+    role_for_user,
+    visible_reports_for,
 )
 
 
@@ -88,9 +104,46 @@ REPORT_PREFETCHES = (
 )
 
 
+DETAIL_FORMSETS = (
+    VisitFormSet,
+    MeetingDecisionFormSet,
+    CommitteeFormSet,
+    LawOffenceFormSet,
+    CorrectionReturneeFormSet,
+    TrainingFormSet,
+    PopulationFormSet,
+    HousingFormSet,
+    WaterSourceFormSet,
+    WaterCommitteeQuestionFormSet,
+    WaterCommitteeMemberFormSet,
+    ToiletTypeFormSet,
+    ElectricityFormSet,
+    HealthConditionFormSet,
+    DisabilityFormSet,
+    CropFormSet,
+    IVDPProjectFormSet,
+    IVDPScheduleFormSet,
+    BusinessFormSet,
+    BusinessTrainingFormSet,
+    AssetSavingFormSet,
+    EvacuationMaterialFormSet,
+    TraditionalTitleFormSet,
+    CulturalKnowledgeFormSet,
+)
+
+
+DETAIL_LABELS_BY_MODEL = {
+    formset.model.__name__: {
+        **FIJIAN_INLINE_LABELS.get(formset.model.__name__, {}),
+        **(getattr(formset.form._meta, "labels", None) or {}),
+    }
+    for formset in DETAIL_FORMSETS
+}
+DETAIL_LABELS_BY_MODEL["WasteManagement"] = WasteManagementForm.Meta.labels
+
+
 def reports_for(user):
-    qs = TNKReport.objects.select_related("owner").prefetch_related(*REPORT_PREFETCHES)
-    return qs if is_roko_user(user) else qs.filter(owner=user)
+    return visible_reports_for(user).prefetch_related(*REPORT_PREFETCHES)
 
 
 def _get_tnk_formsets(data=None, instance=None, initial_seeds=False):
@@ -628,26 +681,33 @@ def _section_forms(form):
     ]
 
 
-def _field_value(obj, field):
+def _field_label(field, labels=None):
+    return (labels or {}).get(field.name, field.verbose_name.title())
+
+
+def _field_value(obj, field, labels=None):
     value = getattr(obj, field.name)
 
     if field.choices:
         value = getattr(obj, f"get_{field.name}_display")()
+    elif isinstance(value, bool):
+        value = "Io" if value else "Sega"
     elif value in (None, ""):
         value = "-"
 
-    return field.verbose_name.title(), value
+    return _field_label(field, labels), value
 
 
 def _detail_sections(report):
     sections = []
+    labels = TNKReportForm.Meta.labels
 
     for title, names in TNK_SECTIONS:
         items = []
 
         for name in names:
             field = report._meta.get_field(name)
-            items.append(_field_value(report, field))
+            items.append(_field_value(report, field, labels))
 
         sections.append((title, items))
 
@@ -659,12 +719,13 @@ def _model_rows(items):
 
     for item in items:
         values = []
+        labels = DETAIL_LABELS_BY_MODEL.get(item._meta.model.__name__, {})
 
         for field in item._meta.fields:
             if field.name in {"id", "report"}:
                 continue
 
-            values.append(_field_value(item, field))
+            values.append(_field_value(item, field, labels))
 
         rows.append(values)
 
@@ -689,7 +750,7 @@ def _child_sections(report):
         ("Tiko Bulabula", _model_rows(report.health_conditions.all())),
         ("Vakaleqai ni Yago", _model_rows(report.disabilities.all())),
         ("Teitei", _model_rows(report.crops.all())),
-        ("IVDP Projects", _model_rows(report.ivdp_projects.all())),
+        ("Tuvatuva ni Veivakatorocaketaki Raraba ni Koro", _model_rows(report.ivdp_projects.all())),
         ("Tuvatuva ni IVDP", _model_rows(report.ivdp_schedule.all())),
         ("Bisinisi", _model_rows(report.businesses.all())),
         ("Vuli ni Bisinisi", _model_rows(report.business_trainings.all())),
@@ -698,6 +759,25 @@ def _child_sections(report):
         ("iTutu Vakavanua", _model_rows(report.traditional_titles.all())),
         ("Kilaka Vakavanua", _model_rows(report.cultural_knowledge.all())),
     ]
+
+
+def _audit_trail_rows(report):
+    rows = []
+    status_labels = dict(TNKReport.STATUS_CHOICES)
+    for action in report.approval_actions.select_related("user"):
+        rows.append(
+            [
+                ("iTavi e Qaravi", action.get_action_type_display()),
+                ("Vakailesilesi", action.user_full_name),
+                ("iTutu", action.user_role),
+                ("iTuvaki e Liu", status_labels.get(action.from_status, action.from_status or "-")),
+                ("iTuvaki Vou", status_labels.get(action.to_status, action.to_status or "-")),
+                ("Vakamacala", action.comment or "-"),
+                ("Vakadinadina Vakadigital", action.digital_acknowledgement),
+                ("Siga kei na Gauna", timezone.localtime(action.created_at).strftime("%d %b %Y %H:%M")),
+            ]
+        )
+    return rows
 
 
 def _waste_instance(report):
@@ -729,9 +809,12 @@ def _handle_report_form(request, report, profile, *, initial_seeds=False):
             with transaction.atomic():
                 report = form.save(commit=False)
 
+                original_status = report.status
+                was_returned = original_status == TNKReport.STATUS_RETURNED_TO_TURAGA
+
                 if action == "submit_report":
                     report.submit()
-                elif report.status != TNKReport.STATUS_SUBMITTED:
+                elif report.status != TNKReport.STATUS_RETURNED_TO_TURAGA:
                     report.status = TNKReport.STATUS_DRAFT
                     report.submitted_at = None
 
@@ -745,6 +828,17 @@ def _handle_report_form(request, report, profile, *, initial_seeds=False):
                 waste = waste_form.save(commit=False)
                 waste.report = report
                 waste.save()
+
+                if action == "submit_report":
+                    comment = "Report resubmitted after correction." if was_returned else "Report submitted for Mata ni Tikina review."
+                    record_action(
+                        request,
+                        report,
+                        TNKApprovalAction.ACTION_SUBMIT,
+                        comment=comment,
+                        to_status=report.status,
+                        from_status=original_status,
+                    )
 
             if action == "submit_report":
                 messages.success(request, "Sa vakau na iVolavola ni Turaga ni Koro.")
@@ -771,7 +865,7 @@ def _handle_report_form(request, report, profile, *, initial_seeds=False):
     return render(request, "turani/report_form.html", context)
 
 
-@membership_required(TuragaProfile.TURAGA_NI_KORO, allow_roko=True)
+@membership_required(TuragaProfile.TURAGA_NI_KORO, TuragaProfile.MATA_NI_TIKINA, TuragaProfile.TURAGA_NI_YAVUSA, TuragaProfile.ROKO, allow_roko=True)
 def report_list(request):
     reports = reports_for(request.user).order_by("-year", "-created_at")
 
@@ -784,42 +878,121 @@ def report_list(request):
     )
 
 
-@membership_required(TuragaProfile.TURAGA_NI_KORO)
+@membership_required(TuragaProfile.TURAGA_NI_KORO, allow_roko=True)
 def report_create(request):
-    profile, defaults = _profile_report_defaults(request.user)
+    owner_profile, response = resolve_report_owner(request, TuragaProfile.TURAGA_NI_KORO, "turani:report_create")
+    if response:
+        return response
+    profile, defaults = _profile_report_defaults(owner_profile.user)
     report = TNKReport(**defaults)
 
     return _handle_report_form(request, report, profile, initial_seeds=True)
 
 
-@membership_required(TuragaProfile.TURAGA_NI_KORO)
+@membership_required(TuragaProfile.TURAGA_NI_KORO, allow_roko=True)
 def report_edit(request, pk):
-    profile, _ = _profile_report_defaults(request.user)
     report = get_object_or_404(reports_for(request.user), pk=pk)
+    if not can_edit_report(request.user, report):
+        messages.error(request, "This report is locked for review and cannot be edited.")
+        return redirect("turani:report_detail", pk=report.pk)
+    profile, _ = _profile_report_defaults(report.owner or request.user)
 
     return _handle_report_form(request, report, profile)
 
 
-@membership_required(TuragaProfile.TURAGA_NI_KORO, allow_roko=True)
+@membership_required(TuragaProfile.TURAGA_NI_KORO, TuragaProfile.MATA_NI_TIKINA, TuragaProfile.TURAGA_NI_YAVUSA, TuragaProfile.ROKO, allow_roko=True)
 def report_detail(request, pk):
     report = get_object_or_404(
         reports_for(request.user).select_related("waste_management"),
         pk=pk,
     )
+    if not can_view_report(request.user, report):
+        raise PermissionDenied
 
     context = {
         "report": report,
         "stats": [
             ("Tagane-Marama", report.total_population()),
             ("Vuvale", report.household_count),
-            ("Lawa", report.total_offences()),
-            ("IVDP", report.total_ivdp_projects()),
+            ("Basuki ni Lawa", report.total_offences()),
+            ("Tuvatuva ni IVDP", report.total_ivdp_projects()),
         ],
         "sections": _detail_sections(report),
         "child_sections": _child_sections(report),
+        "approval_actions": report.approval_actions.select_related("user"),
+        "workflow_actions": allowed_actions(request.user, report),
+        "approval_form": ApprovalActionForm(),
+        "can_edit_report": can_edit_report(request.user, report),
     }
 
     return render(request, "turani/report_detail.html", context)
+
+
+@membership_required(TuragaProfile.TURAGA_NI_KORO, TuragaProfile.MATA_NI_TIKINA, TuragaProfile.TURAGA_NI_YAVUSA, TuragaProfile.ROKO, allow_roko=True)
+@require_POST
+def report_workflow_action(request, pk, action_type):
+    report = get_object_or_404(reports_for(request.user), pk=pk)
+    if not can_view_report(request.user, report):
+        raise PermissionDenied
+
+    form = ApprovalActionForm(request.POST)
+    if not form.is_valid():
+        messages.error(request, "Please confirm the digital acknowledgement before continuing.")
+        return redirect("turani:report_detail", pk=report.pk)
+
+    try:
+        record_action(
+            request,
+            report,
+            action_type,
+            comment=form.cleaned_data.get("comment", ""),
+        )
+    except ValidationError as exc:
+        messages.error(request, exc.messages[0] if exc.messages else "Invalid workflow action.")
+        return redirect("turani:report_detail", pk=report.pk)
+
+    messages.success(request, "The approval action was recorded in the audit trail.")
+    return redirect("turani:report_detail", pk=report.pk)
+
+
+@membership_required(TuragaProfile.TURAGA_NI_KORO, TuragaProfile.MATA_NI_TIKINA, TuragaProfile.TURAGA_NI_YAVUSA, TuragaProfile.ROKO, allow_roko=True)
+def approval_timeline(request, pk):
+    report = get_object_or_404(reports_for(request.user), pk=pk)
+    if not can_view_report(request.user, report):
+        raise PermissionDenied
+    return render(
+        request,
+        "turani/approval_timeline.html",
+        {
+            "report": report,
+            "approval_actions": report.approval_actions.select_related("user"),
+        },
+    )
+
+
+@membership_required(TuragaProfile.TURAGA_NI_KORO, TuragaProfile.MATA_NI_TIKINA, TuragaProfile.TURAGA_NI_YAVUSA, TuragaProfile.ROKO, allow_roko=True)
+def report_pdf(request, pk):
+    report = get_object_or_404(
+        reports_for(request.user).select_related("waste_management"),
+        pk=pk,
+    )
+    return report_pdf_response(
+        title="Turaga ni Koro Quarterly Report",
+        subtitle=f"{report.village} - {report.district} - {report.quarter} {report.year}",
+        meta_rows=[
+            ("iTutu", "Turaga ni Koro"),
+            ("Koro", report.village),
+            ("Tikina", report.district),
+            ("Ripote ni vula ko", report.quarter),
+            ("Ena yabaki ko", report.year),
+            ("iTuvaki", report.get_status_display()),
+            ("Siga ni vakau", report.submitted_at.strftime("%d %b %Y") if report.submitted_at else "-"),
+        ],
+        sections=_detail_sections(report),
+        child_sections=_child_sections(report),
+        audit_rows=_audit_trail_rows(report),
+        filename=f"turaga-ni-koro-{report.village}-{report.quarter}-{report.year}.pdf".replace(" ", "-").lower(),
+    )
 
 
 @membership_required(TuragaProfile.TURAGA_NI_KORO, allow_roko=True)
@@ -872,6 +1045,13 @@ def turaga_dashboard(request):
         .distinct()
         .order_by("-year", "quarter")[:8],
         "analysis": analysis,
+        "workflow_queues": {
+            "draft": reports.filter(status=TNKReport.STATUS_DRAFT),
+            "returned": reports.filter(status=TNKReport.STATUS_RETURNED_TO_TURAGA),
+            "submitted": reports.exclude(status__in=[TNKReport.STATUS_DRAFT, TNKReport.STATUS_RETURNED_TO_TURAGA, TNKReport.STATUS_FINAL_APPROVED]),
+            "final": reports.filter(status=TNKReport.STATUS_FINAL_APPROVED),
+        },
+        "workflow_role": role_for_user(request.user),
     }
 
     return render(request, "turani/dashboard.html", context)

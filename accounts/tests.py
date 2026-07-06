@@ -1,9 +1,11 @@
 from datetime import date
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
 
+from accounts.models import TuragaProfile, UserProfile
 from koro.models import Koro
 from tikina.models import Tikina
 
@@ -141,3 +143,64 @@ class NavigationTests(TestCase):
             self.assertContains(response, reverse(create_name))
             self.assertContains(response, reverse("accounts:profile"))
             self.client.logout()
+
+    def test_dashboard_redirect_uses_explicit_assigned_role(self):
+        cases = (
+            ("mata_ni_tikina", "/mata-ni-tikina/dashboard/"),
+            ("liuliu_ni_yavusa", "/turaga-ni-yavusa/dashboard/"),
+        )
+        for index, (role, dashboard_url) in enumerate(cases):
+            user = get_user_model().objects.create_user(f"assigned{index}", password="StrongPass123!")
+            UserProfile.objects.create(user=user, role=role)
+            self.client.force_login(user)
+
+            response = self.client.get(reverse("accounts:dashboard"))
+
+            self.assertRedirects(response, dashboard_url, fetch_redirect_response=False)
+            self.client.logout()
+
+    def test_dashboard_redirect_removes_stale_koro_group_from_assigned_role(self):
+        user = get_user_model().objects.create_user("stale-koro", password="StrongPass123!")
+        UserProfile.objects.create(user=user, role="mata_ni_tikina")
+        stale_group, _ = Group.objects.get_or_create(name="turaga_ni_koro")
+        user.groups.add(stale_group)
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("accounts:dashboard"))
+
+        self.assertRedirects(response, "/mata-ni-tikina/dashboard/", fetch_redirect_response=False)
+        self.assertFalse(user.groups.filter(name="turaga_ni_koro").exists())
+        self.assertTrue(user.groups.filter(name="mata_ni_tikina").exists())
+
+    def test_roko_admin_selects_report_owner_before_creating_hardcopy_report(self):
+        roko = get_user_model().objects.create_user("roko-admin", password="StrongPass123!")
+        roko_group, _ = Group.objects.get_or_create(name="roko_admin")
+        roko.groups.add(roko_group)
+        self.client.force_login(roko)
+
+        cases = (
+            ("turaga_ni_koro", "turani:report_create", "Select Turaga ni Koro", "Na Ripote ni Turaga ni Koro"),
+            ("mata_ni_tikina", "mata_ni_tikina:report_create", "Select Mata ni Tikina", "Ripote ni Mata ni Tikina"),
+            ("turaga_ni_yavusa", "turaga_ni_yavusa:report_create", "Select Turaga ni Yavusa", "Ripote ni Turaga ni Yavusa"),
+        )
+        for index, (role, create_name, selector_text, form_text) in enumerate(cases):
+            target = self.make_member(f"hardcopy{index}", role)
+
+            response = self.client.get(reverse(create_name))
+            self.assertContains(response, selector_text)
+            self.assertContains(response, target.turaga_profile.full_name)
+
+            response = self.client.get(reverse(create_name), {"owner": target.pk})
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, form_text)
+
+    def test_roko_group_counts_as_roko_user_for_report_views(self):
+        roko = get_user_model().objects.create_user("group-roko", password="StrongPass123!")
+        roko_group, _ = Group.objects.get_or_create(name="roko_admin")
+        roko.groups.add(roko_group)
+
+        self.client.force_login(roko)
+        response = self.client.get(reverse("turani:report_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(roko.turaga_profile.membership_type, TuragaProfile.TURAGA_NI_KORO)

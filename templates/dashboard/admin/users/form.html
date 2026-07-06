@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == "create" %}Create User{% else %}Edit User{% endif %} | Roko Admin{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 py-8">
+  <div class="grid gap-5 md:grid-cols-[260px_1fr]">
+    {% include "partials/sidebar_admin.html" %}
+    <div class="min-w-0 space-y-6">
+      <div class="masi-card-accent rounded-md bg-lau-white p-6 shadow-sm">
+        <p class="text-sm font-semibold uppercase text-lau-earth">User Management</p>
+        <h1 class="mt-2 font-display text-3xl text-lau-navy">{% if mode == "create" %}Create User{% else %}Edit User{% endif %}</h1>
+      </div>
+
+      <form method="post" class="rounded-md bg-lau-white p-6 shadow-sm">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="mb-5 rounded-md bg-red-50 p-4 text-sm text-red-800">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="grid gap-5 md:grid-cols-2">
+          <label class="block text-sm font-semibold text-lau-navy">Role{{ form.role }}{% for error in form.role.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          <label class="block text-sm font-semibold text-lau-navy">Username{{ form.username }}{% for error in form.username.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          <label class="block text-sm font-semibold text-lau-navy">First name{{ form.first_name }}{% for error in form.first_name.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          <label class="block text-sm font-semibold text-lau-navy">Last name{{ form.last_name }}{% for error in form.last_name.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          <label class="block text-sm font-semibold text-lau-navy">Email{{ form.email }}{% for error in form.email.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-md border border-lau-navy/10 px-3 py-2 text-sm font-semibold text-lau-navy">{{ form.is_active }} Active account{% for error in form.is_active.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          <label class="block text-sm font-semibold text-lau-navy">{% if mode == "create" %}Password{% else %}New password{% endif %}{{ form.password1 }}{% for error in form.password1.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          <label class="block text-sm font-semibold text-lau-navy">Confirm password{{ form.password2 }}{% for error in form.password2.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+        </div>
+
+        <section class="role-fields role-turaga_ni_koro role-mata_ni_tikina mt-6 rounded-md border border-lau-navy/10 p-5">
+          <h2 class="font-display text-xl text-lau-navy">Koro / Tikina Details</h2>
+          <div class="mt-4 grid gap-5 md:grid-cols-2">
+            <label class="block text-sm font-semibold text-lau-navy">Date of birth{{ form.date_of_birth }}{% for error in form.date_of_birth.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+            <label class="role-fields role-turaga_ni_koro block text-sm font-semibold text-lau-navy">Date appointed{{ form.appointment_date }}{% for error in form.appointment_date.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+            <label class="block text-sm font-semibold text-lau-navy">Tikina / District{{ form.district }}{% for error in form.district.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+            <label class="block text-sm font-semibold text-lau-navy">Koro / Village{{ form.village }}{% for error in form.village.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          </div>
+        </section>
+
+        <section class="role-fields role-liuliu_ni_yavusa mt-6 rounded-md border border-lau-navy/10 p-5">
+          <h2 class="font-display text-xl text-lau-navy">Yavusa Details</h2>
+          <div class="mt-4 grid gap-5 md:grid-cols-2">
+            <label class="block text-sm font-semibold text-lau-navy">Tokatoka{{ form.tokatoka }}{% for error in form.tokatoka.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+            <label class="block text-sm font-semibold text-lau-navy">Mataqali{{ form.mataqali }}{% for error in form.mataqali.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+            <label class="block text-sm font-semibold text-lau-navy">Yavusa{{ form.yavusa }}{% for error in form.yavusa.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+            <label class="block text-sm font-semibold text-lau-navy">Vanua{{ form.vanua }}{% for error in form.vanua.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          </div>
+        </section>
+
+        <section class="mt-6 rounded-md border border-lau-navy/10 p-5">
+          <h2 class="font-display text-xl text-lau-navy">Contact</h2>
+          <div class="mt-4 grid gap-5 md:grid-cols-2">
+            <label class="block text-sm font-semibold text-lau-navy">Province{{ form.province }}{% for error in form.province.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+            <label class="block text-sm font-semibold text-lau-navy">Phone{{ form.phone_number }}{% for error in form.phone_number.errors %}<span class="mt-1 block text-xs text-red-700">{{ error }}</span>{% endfor %}</label>
+          </div>
+        </section>
+
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+          <button type="submit" class="rounded-md bg-lau-gold px-5 py-3 text-sm font-semibold text-lau-navy">Save user</button>
+          <a href="{% url 'admin_panel:user_list' %}" class="rounded-md px-5 py-3 text-center text-sm font-semibold text-lau-navy hover:bg-lau-cream">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+const roleSelect = document.getElementById("id_role");
+const tikinaSelect = document.getElementById("id_district");
+const koroSelect = document.getElementById("id_village");
+function updateRoleFields() {
+  const role = roleSelect.value;
+  document.querySelectorAll(".role-fields").forEach((element) => {
+    element.classList.toggle("hidden", !element.classList.contains(`role-${role}`));
+  });
+}
+function updateKoroOptions() {
+  if (!tikinaSelect || !koroSelect) return;
+  const selectedTikina = tikinaSelect.value;
+  let selectedIsAvailable = false;
+
+  [...koroSelect.options].forEach((option) => {
+    if (!option.value) return;
+
+    const available = Boolean(selectedTikina) && option.dataset.tikina === selectedTikina;
+    option.hidden = !available;
+    option.disabled = !available;
+
+    if (available && option.selected) selectedIsAvailable = true;
+  });
+
+  if (!selectedIsAvailable) koroSelect.value = "";
+  koroSelect.disabled = !selectedTikina;
+}
+roleSelect.addEventListener("change", updateRoleFields);
+if (tikinaSelect) tikinaSelect.addEventListener("change", updateKoroOptions);
+updateRoleFields();
+updateKoroOptions();
+</script>
+{% endblock %}

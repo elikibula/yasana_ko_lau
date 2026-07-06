@@ -2,6 +2,12 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+from common.reporting_periods import (
+    QUARTER_CHOICES,
+    is_report_overdue,
+    reporting_due_date,
+)
+
 
 class TNKReport(models.Model):
     YES_NO = (
@@ -9,18 +15,34 @@ class TNKReport(models.Model):
         ("sega", "Sega"),
     )
 
-    QUARTERS = (
-        ("Q1", "Q1 - January to March"),
-        ("Q2", "Q2 - April to June"),
-        ("Q3", "Q3 - July to September"),
-        ("Q4", "Q4 - October to December"),
-    )
+    QUARTERS = QUARTER_CHOICES
 
     STATUS_DRAFT = "draft"
-    STATUS_SUBMITTED = "submitted"
+    STATUS_SUBMITTED_TO_MATA = "submitted_mata"
+    STATUS_RETURNED_TO_TURAGA = "returned_turaga"
+    STATUS_APPROVED_BY_MATA = "approved_mata"
+    STATUS_SUBMITTED_TO_LIULIU = "submitted_liuliu"
+    STATUS_APPROVED_BY_LIULIU = "approved_liuliu"
+    STATUS_SUBMITTED_TO_ASSISTANT = "submitted_assistant"
+    STATUS_RECOMMENDED_BY_ASSISTANT = "recommended_assistant"
+    STATUS_SUBMITTED_TO_ROKO = "submitted_roko"
+    STATUS_FINAL_APPROVED = "final_approved"
+    STATUS_REJECTED = "rejected"
+    STATUS_ARCHIVED = "archived"
+    STATUS_SUBMITTED = STATUS_SUBMITTED_TO_MATA
     STATUS_CHOICES = (
         (STATUS_DRAFT, "Draft"),
-        (STATUS_SUBMITTED, "Submitted"),
+        (STATUS_SUBMITTED_TO_MATA, "Submitted to Mata ni Tikina"),
+        (STATUS_RETURNED_TO_TURAGA, "Returned to Turaga ni Koro"),
+        (STATUS_APPROVED_BY_MATA, "Approved by Mata ni Tikina"),
+        (STATUS_SUBMITTED_TO_LIULIU, "Submitted to Liuliu ni Yavusa"),
+        (STATUS_APPROVED_BY_LIULIU, "Approved by Liuliu ni Yavusa"),
+        (STATUS_SUBMITTED_TO_ASSISTANT, "Submitted to Assistant Roko"),
+        (STATUS_RECOMMENDED_BY_ASSISTANT, "Recommended by Assistant Roko"),
+        (STATUS_SUBMITTED_TO_ROKO, "Submitted to Roko Tui"),
+        (STATUS_FINAL_APPROVED, "Final Approved"),
+        (STATUS_REJECTED, "Rejected"),
+        (STATUS_ARCHIVED, "Archived"),
     )
 
     owner = models.ForeignKey(
@@ -82,7 +104,7 @@ class TNKReport(models.Model):
     roko_veivuke_comment = models.TextField(blank=True)
 
     status = models.CharField(
-        max_length=20,
+        max_length=40,
         choices=STATUS_CHOICES,
         default=STATUS_DRAFT,
     )
@@ -92,8 +114,23 @@ class TNKReport(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def submit(self):
-        self.status = self.STATUS_SUBMITTED
+        self.status = self.STATUS_SUBMITTED_TO_MATA
         self.submitted_at = timezone.now()
+
+    @property
+    def is_locked(self):
+        return self.status not in {
+            self.STATUS_DRAFT,
+            self.STATUS_RETURNED_TO_TURAGA,
+        }
+
+    @property
+    def due_date(self):
+        return reporting_due_date(self.quarter, self.year)
+
+    @property
+    def is_overdue(self):
+        return is_report_overdue(self)
 
     def total_population(self):
         return sum(item.count for item in self.population.all())
@@ -123,6 +160,48 @@ class TNKReport(models.Model):
 
     def __str__(self):
         return f"{self.village} - {self.quarter} {self.year}"
+
+
+class TNKApprovalAction(models.Model):
+    ACTION_SUBMIT = "submit"
+    ACTION_APPROVE = "approve"
+    ACTION_RETURN = "return"
+    ACTION_REJECT = "reject"
+    ACTION_RECOMMEND = "recommend"
+    ACTION_FINAL_APPROVE = "final_approve"
+    ACTION_ARCHIVE = "archive"
+    ACTION_COMMENT = "comment"
+    ACTION_CHOICES = (
+        (ACTION_SUBMIT, "Submit"),
+        (ACTION_APPROVE, "Approve"),
+        (ACTION_RETURN, "Return"),
+        (ACTION_REJECT, "Reject"),
+        (ACTION_RECOMMEND, "Recommend"),
+        (ACTION_FINAL_APPROVE, "Final approve"),
+        (ACTION_ARCHIVE, "Archive"),
+        (ACTION_COMMENT, "Comment"),
+    )
+
+    report = models.ForeignKey(TNKReport, on_delete=models.PROTECT, related_name="approval_actions")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="tnk_approval_actions")
+    user_full_name = models.CharField(max_length=150)
+    user_role = models.CharField(max_length=100)
+    action_type = models.CharField(max_length=30, choices=ACTION_CHOICES)
+    from_status = models.CharField(max_length=40, blank=True)
+    to_status = models.CharField(max_length=40, blank=True)
+    comment = models.TextField(blank=True)
+    digital_acknowledgement = models.TextField()
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "pk"]
+        verbose_name = "TNK Approval Action"
+        verbose_name_plural = "TNK Approval Actions"
+
+    def __str__(self):
+        return f"{self.report} - {self.get_action_type_display()} by {self.user_full_name}"
 
 
 class Visit(models.Model):

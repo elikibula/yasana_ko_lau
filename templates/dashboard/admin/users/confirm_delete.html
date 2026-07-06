@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Delete User | Roko Admin{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 py-8">
+  <div class="grid gap-5 md:grid-cols-[260px_1fr]">
+    {% include "partials/sidebar_admin.html" %}
+    <div class="min-w-0">
+      <div class="rounded-md bg-lau-white p-6 shadow-sm">
+        <p class="text-sm font-semibold uppercase text-red-700">Delete user</p>
+        <h1 class="mt-2 font-display text-3xl text-lau-navy">{{ managed_user.get_full_name|default:managed_user.username }}</h1>
+        <p class="mt-3 text-gray-700">This will remove the account when possible. Accounts with existing protected reports will be deactivated instead.</p>
+        <form method="post" class="mt-6 flex flex-col gap-3 sm:flex-row">
+          {% csrf_token %}
+          <button type="submit" class="rounded-md bg-red-700 px-5 py-3 text-sm font-semibold text-white">Delete user</button>
+          <a href="{% url 'admin_panel:user_list' %}" class="rounded-md px-5 py-3 text-center text-sm font-semibold text-lau-navy hover:bg-lau-cream">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

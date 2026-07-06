@@ -39,6 +39,54 @@
       </div>
 
       <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase text-lau-earth">Hardcopy report entry</p>
+            <h2 class="mt-1 font-display text-2xl text-lau-navy">Create reports for registered officers</h2>
+          </div>
+        </div>
+        <div class="mt-4 grid gap-3 md:grid-cols-3">
+          <a href="{% url 'turani:report_create' %}" class="rounded-md bg-lau-navy p-4 font-semibold text-lau-gold shadow-sm">Create Turaga ni Koro report</a>
+          <a href="{% url 'mata_ni_tikina:report_create' %}" class="rounded-md bg-lau-ocean p-4 font-semibold text-white shadow-sm">Create Mata ni Tikina report</a>
+          <a href="{% url 'turaga_ni_yavusa:report_create' %}" class="rounded-md bg-lau-earth p-4 font-semibold text-white shadow-sm">Create Turaga ni Yavusa report</a>
+        </div>
+      </section>
+
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p class="text-sm font-semibold uppercase text-lau-earth">Report PDF exports</p>
+            <h2 class="mt-1 font-display text-2xl text-lau-navy">Select a submitted quarterly report</h2>
+          </div>
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <a href="{% url 'turani:report_list' %}" class="rounded-md bg-lau-cream px-4 py-2 text-sm font-semibold text-lau-navy">Turaga ni Koro</a>
+            <a href="{% url 'mata_ni_tikina:report_list' %}" class="rounded-md bg-lau-cream px-4 py-2 text-sm font-semibold text-lau-navy">Mata ni Tikina</a>
+            <a href="{% url 'turaga_ni_yavusa:report_list' %}" class="rounded-md bg-lau-cream px-4 py-2 text-sm font-semibold text-lau-navy">Turaga ni Yavusa</a>
+          </div>
+        </div>
+        <div class="mt-4 overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-lau-navy text-lau-cream">
+              <tr><th class="px-4 py-3">Role</th><th class="px-4 py-3">Report</th><th class="px-4 py-3">Quarter</th><th class="px-4 py-3">Date</th><th class="px-4 py-3 text-right">Actions</th></tr>
+            </thead>
+            <tbody class="divide-y divide-lau-cream">
+              {% for created, role, area, quarter, year, url_name, pdf_url_name, pk in pdf_reports %}
+                <tr>
+                  <td class="px-4 py-3">{{ role }}</td>
+                  <td class="px-4 py-3 font-semibold text-lau-navy">{{ area }}</td>
+                  <td class="px-4 py-3">{{ quarter }} {{ year }}</td>
+                  <td class="px-4 py-3">{{ created|date:"d M Y" }}</td>
+                  <td class="px-4 py-3 text-right"><a class="font-semibold text-lau-earth" href="{% url url_name pk %}">View</a><span class="text-lau-muted"> / </span><a class="font-semibold text-lau-earth" href="{% url pdf_url_name pk %}">PDF</a></td>
+                </tr>
+              {% empty %}
+                <tr><td class="px-4 py-5 text-gray-600" colspan="5">No quarterly reports are ready for PDF export yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="rounded-md bg-lau-white p-5 shadow-sm">
         <h2 class="font-display text-2xl text-lau-navy">Official Tikina Summary</h2>
         <div class="mt-4 overflow-x-auto">
           <table class="min-w-full text-left text-sm">

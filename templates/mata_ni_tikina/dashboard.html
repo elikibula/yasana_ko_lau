@@ -1,42 +1,481 @@
 {% extends "base.html" %}
 {% load humanize %}
+
 {% block title %}Mata ni Tikina Dashboard{% endblock %}
+
 {% block content %}
 <section class="bg-lau-cream py-8">
   <div class="mx-auto max-w-7xl px-4">
-    <div class="rounded-lg bg-lau-navy p-6 text-lau-cream shadow-lg">
-      <p class="text-sm font-semibold uppercase text-lau-gold">Mata ni Tikina</p>
-      <h1 class="mt-2 font-display text-3xl">Tikina Governance Dashboard</h1>
-      <p class="mt-3 text-sm text-lau-cream/80">{{ analysis.overview.summary }}</p>
-      <a href="{% url 'mata_ni_tikina:report_create' %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">+ Ivolavola Vou</a>
-    </div>
-    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Reports</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.overview.total_reports|intcomma }}</p></div>
-      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Tikina</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.overview.tikinas_covered|intcomma }}</p></div>
-      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Soli Collected</p><p class="text-3xl font-bold text-lau-navy">${{ analysis.finance.soli_collected|floatformat:2 }}</p></div>
-      <div class="rounded-md bg-lau-white p-5 shadow-sm"><p class="text-sm text-lau-muted">Village Visits</p><p class="text-3xl font-bold text-lau-navy">{{ analysis.village_visits.total_visits|intcomma }}</p></div>
-    </div>
-    <div class="mt-6 grid gap-6 lg:grid-cols-3">
-      <section class="rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm lg:col-span-3">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Reference Data - sourced from Turaga ni Koro reports</p>
-        <div class="mt-4 grid gap-4 sm:grid-cols-4">
-          <div><p class="text-sm text-lau-muted">TNK Reports</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.report_count|intcomma }}</p></div>
-          <div><p class="text-sm text-lau-muted">Population</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.population_total|intcomma }}</p></div>
-          <div><p class="text-sm text-lau-muted">Households</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.household_total|intcomma }}</p></div>
-          <div><p class="text-sm text-lau-muted">Businesses</p><p class="text-2xl font-bold text-lau-navy">{{ reference_data.business_total|intcomma }}</p></div>
+
+    <div class="flex flex-col gap-8 lg:flex-row">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="w-full shrink-0 lg:sticky lg:top-6 lg:w-72 xl:w-80 self-start">
+        {% include "partials/sidebar_tikina.html" %}
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="min-w-0 flex-1">
+
+        <div class="rounded-lg bg-lau-navy p-6 text-lau-cream shadow-lg">
+          <p class="text-sm font-semibold uppercase text-lau-gold">Mata ni Tikina Dashboard</p>
+          <h1 class="mt-2 font-display text-3xl">
+            Malo a bula {{ request.user.get_full_name|default:request.user.username }}
+          </h1>
+          <p class="mt-3 max-w-4xl text-sm text-lau-cream/80">{{ analysis.latest.summary }}</p>
+
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a href="{% url 'mata_ni_tikina:report_create' %}" class="inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">
+              + Ripote Vou
+            </a>
+            <span class="inline-flex rounded-md border border-lau-gold/40 px-4 py-2 text-sm text-lau-cream">
+              Ripote kece: {{ analysis.overview.total_reports|intcomma }}
+            </span>
+            <span class="inline-flex rounded-md border border-lau-gold/40 px-4 py-2 text-sm text-lau-cream">
+              Ripote sa vakau: {{ analysis.overview.submitted_reports|intcomma }}
+            </span>
+          </div>
         </div>
-      </section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Coordination Status</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.coordination.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Social Indicators</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.social_indicators.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Income Sources</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.income.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Infrastructure</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.infrastructure.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Government Partnership</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.government_partnership.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">NGO Partnership</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.ngo_partnership.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Financial/Soli</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.finance.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Farmland</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.farmland.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Representative Participation</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.representation.summary }}</p></section>
-      <section class="rounded-md bg-lau-white p-5 shadow-sm"><h2 class="font-display text-xl text-lau-navy">Village Visits</h2><p class="mt-3 text-sm text-lau-muted">{{ analysis.village_visits.summary }}</p></section>
+
+        <section class="mt-6 rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Approval Queue</p>
+              <h2 class="font-display text-xl text-lau-navy">
+                Ripote ni Turaga ni Koro ka vinakata a veivakadonui i Mata ni Jikina
+              </h2>
+            </div>
+            <span class="rounded-md bg-lau-cream px-3 py-1 text-sm font-semibold text-lau-navy">
+              {{ tnk_review_queue.count }} waiting
+            </span>
+          </div>
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="text-left text-lau-muted">
+                  <th class="py-2 pr-3">Koro</th>
+                  <th class="py-2 pr-3">Quarter</th>
+                  <th class="py-2 pr-3">Status</th>
+                  <th class="py-2"></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-lau-navy/10">
+                {% for report in tnk_review_queue %}
+                  <tr>
+                    <td class="py-2 pr-3 font-semibold text-lau-navy">{{ report.village }}</td>
+                    <td class="py-2 pr-3">{{ report.quarter }} {{ report.year }}</td>
+                    <td class="py-2 pr-3">{{ report.get_status_display }}</td>
+                    <td class="py-2">
+                      <a class="font-semibold text-lau-earth" href="{% url 'turani:report_detail' report.pk %}">
+                        Review
+                      </a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="py-4 text-lau-muted">No reports are waiting for review.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {% for card in analysis.latest.metric_cards %}
+            <div class="rounded-md bg-lau-white p-5 shadow-sm">
+              <p class="text-sm text-lau-muted">{{ card.label }}</p>
+              <p class="mt-1 text-3xl font-bold text-lau-navy">
+                {% if card.money %}${% endif %}{{ card.value|floatformat:0|intcomma }}
+              </p>
+            </div>
+          {% empty %}
+            <div class="rounded-md bg-lau-white p-5 shadow-sm lg:col-span-4">
+              <p class="text-sm text-lau-muted">
+                Se bera na itukutuku me vakaraitaki. Tekivu ena dua na Ripote Vou.
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-3">
+          <section class="rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm lg:col-span-2">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Na ka e dodonu me raici taumada</p>
+                <h2 class="font-display text-xl text-lau-navy">iVakasala mai na ripote vou</h2>
+              </div>
+              {% if analysis.latest.exists %}
+                <span class="rounded-md bg-lau-cream px-3 py-1 text-sm font-semibold text-lau-navy">
+                  {{ analysis.latest.status }}
+                </span>
+              {% endif %}
+            </div>
+
+            <ul class="mt-4 grid gap-3">
+              {% for alert in analysis.latest.alerts %}
+                <li class="rounded-md border border-lau-navy/10 bg-lau-cream/60 px-4 py-3 text-sm text-lau-navy">
+                  {{ alert }}
+                </li>
+              {% endfor %}
+            </ul>
+          </section>
+
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Soli ni Jikina</p>
+            <h2 class="font-display text-xl text-lau-navy">{{ analysis.latest.finance.soli_percent }}% sa kumuni</h2>
+
+            <div class="mt-4 h-4 overflow-hidden rounded-full bg-lau-cream">
+              <div class="h-full rounded-full bg-lau-gold" style="width: {{ analysis.latest.finance.soli_percent }}%"></div>
+            </div>
+
+            <dl class="mt-4 grid gap-2 text-sm">
+              <div class="flex justify-between gap-3">
+                <dt class="text-lau-muted">iNaki</dt>
+                <dd class="font-semibold text-lau-navy">${{ analysis.latest.finance.soli_target|floatformat:2 }}</dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-lau-muted">Sa kumuni</dt>
+                <dd class="font-semibold text-lau-navy">${{ analysis.latest.finance.soli_collected|floatformat:2 }}</dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-lau-muted">Vo tiko</dt>
+                <dd class="font-semibold text-lau-navy">${{ analysis.latest.finance.soli_balance|floatformat:2 }}</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="font-display text-xl text-lau-navy">Koro kei na Liuliu Vakavanua</h2>
+              <span class="text-sm font-semibold text-lau-muted">
+                {{ analysis.latest.koro.installed }}/{{ analysis.latest.koro.total }} Buli oti
+              </span>
+            </div>
+
+            <div class="mt-4 h-3 overflow-hidden rounded-full bg-lau-cream">
+              <div class="h-full rounded-full bg-lau-ocean" style="width: {{ analysis.latest.koro.percent }}%"></div>
+            </div>
+
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="text-left text-lau-muted">
+                    <th class="py-2 pr-3">Koro</th>
+                    <th class="py-2 pr-3">Liuliu</th>
+                    <th class="py-2">Buli oti?</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-lau-navy/10">
+                  {% for row in analysis.latest.koro.rows %}
+                    <tr>
+                      <td class="py-2 pr-3 font-semibold text-lau-navy">{{ row.village }}</td>
+                      <td class="py-2 pr-3 text-lau-navy">{{ row.leader }}</td>
+                      <td class="py-2">
+                        <span class="rounded-md px-2 py-1 text-xs font-semibold {% if row.needs_attention %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}">
+                          {{ row.installed }}
+                        </span>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="3" class="py-4 text-lau-muted">Se bera ni volai na Koro.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">Wiliwili ni Bose</h2>
+
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.latest.bose_chart %}
+                <div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-lau-navy">{{ row.label }}</span>
+                    <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+                  </div>
+                  <div class="mt-1 h-3 overflow-hidden rounded-full bg-lau-cream">
+                    <div class="h-full rounded-full bg-lau-ocean" style="width: {{ row.percent }}%"></div>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">Se bera ni volai na wiliwili ni bose.</p>
+              {% endfor %}
+            </div>
+
+            <h3 class="mt-6 font-display text-lg text-lau-navy">Baqe / Soqosoqo</h3>
+
+            <div class="mt-3 overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="text-left text-lau-muted">
+                    <th class="py-2 pr-3">E maroroi lavo?</th>
+                    <th class="py-2">Baqe / Soqosoqo</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-lau-navy/10">
+                  {% for row in analysis.latest.finance.savings_rows %}
+                    <tr>
+                      <td class="py-2 pr-3 text-lau-navy">{{ row.funds_held }}</td>
+                      <td class="py-2 text-lau-navy">{{ row.bank }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="2" class="py-4 text-lau-muted">Se bera ni volai na maroroi lavo.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-3">
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">Na Vuli</h2>
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="text-left text-lau-muted">
+                    <th class="py-2 pr-3">Vuli</th>
+                    <th class="py-2 pr-3">Liutaka</th>
+                    <th class="py-2">Lewe ni vuli</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-lau-navy/10">
+                  {% for row in analysis.latest.education_rows %}
+                    <tr>
+                      <td class="py-2 pr-3 text-lau-navy">{{ row.training }}</td>
+                      <td class="py-2 pr-3 text-lau-navy">{{ row.leader }}</td>
+                      <td class="py-2 font-semibold text-lau-navy">{{ row.participants|intcomma }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="3" class="py-4 text-lau-muted">Se bera ni volai na vuli.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">Veileti se Leqa</h2>
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.latest.disputes %}
+                <div class="rounded-md border border-lau-navy/10 p-3 text-sm">
+                  <p class="font-semibold text-lau-navy">{{ row.description }}</p>
+                  <p class="mt-1 {% if row.open %}text-red-700{% else %}text-lau-muted{% endif %}">
+                    {{ row.resolution }}
+                  </p>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">E sega ni volai na veileti ena ripote qo.</p>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">Veisiko ena Veikoro</h2>
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.latest.village_visit_rows %}
+                <div class="rounded-md border border-lau-navy/10 p-3 text-sm">
+                  <div class="flex justify-between gap-3">
+                    <p class="font-semibold text-lau-navy">{{ row.village }}</p>
+                    <p class="text-lau-muted">{{ row.date }}</p>
+                  </div>
+                  <p class="mt-1 text-lau-navy">{{ row.role }}</p>
+                  <p class="mt-1 text-xs text-lau-muted">{{ row.confirmation }}</p>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">Se bera ni volai na veisiko.</p>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
+
+        <section class="mt-6 rounded-md bg-lau-white p-5 shadow-sm">
+          <h2 class="font-display text-xl text-lau-navy">Lewa ni Matabose me Qaravi Tarava</h2>
+          <div class="mt-4 grid gap-4 md:grid-cols-2">
+            {% for row in analysis.latest.decisions %}
+              <div class="rounded-md border border-lau-navy/10 p-4">
+                <p class="text-xs font-semibold uppercase text-lau-muted">{{ row.label }}</p>
+                <p class="mt-2 text-sm text-lau-navy">{{ row.value }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+
+        <section class="mt-6 rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">
+            Reference Data - mai na ripote ni Turaga ni Koro
+          </p>
+
+          <div class="mt-4 grid gap-4 sm:grid-cols-4">
+            <div>
+              <p class="text-sm text-lau-muted">Ripote TNK</p>
+              <p class="text-2xl font-bold text-lau-navy">{{ reference_data.report_count|intcomma }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-lau-muted">Lewe ni Vanua</p>
+              <p class="text-2xl font-bold text-lau-navy">{{ reference_data.population_total|intcomma }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-lau-muted">Vuvale</p>
+              <p class="text-2xl font-bold text-lau-navy">{{ reference_data.household_total|intcomma }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-lau-muted">Bisinisi</p>
+              <p class="text-2xl font-bold text-lau-navy">{{ reference_data.business_total|intcomma }}</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">Levu ni Soli ni Yasana sa soli rawa</h2>
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.all_time.timeline_rows %}
+                <div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-lau-navy">{{ row.period }}</span>
+                    <span class="font-semibold text-lau-navy">${{ row.soli|floatformat:2 }}</span>
+                  </div>
+                  <div class="mt-1 h-3 overflow-hidden rounded-full bg-lau-cream">
+                    <div class="h-full rounded-full bg-lau-gold" style="width: {{ row.soli_percent }}%"></div>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">Se bera na data me vakaraitaki kina na veisau.</p>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">iVurevure ni Lavo</h2>
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.income.categories %}
+                <div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-lau-navy">{{ row.label }}</span>
+                    <span class="font-semibold text-lau-navy">{{ row.total|intcomma }}</span>
+                  </div>
+                  <div class="mt-1 h-3 overflow-hidden rounded-full bg-lau-cream">
+                    <div class="h-full rounded-full bg-lau-ocean" style="width: {{ row.percent }}%"></div>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">Se bera ni volai na iVurevure ni Lavo.</p>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-3">
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">iTuvaki ni Veisemati</h2>
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.coordination.status_counts %}
+                <div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-lau-navy">{{ row.label }}</span>
+                    <span class="font-semibold text-lau-navy">{{ row.total }}</span>
+                  </div>
+                  <div class="mt-1 h-3 overflow-hidden rounded-full bg-lau-cream">
+                    <div class="h-full rounded-full bg-lau-ocean" style="width: {{ row.percent }}%"></div>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">Se bera na data.</p>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">Bolebole ni Kumuni Lavo</h2>
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.finance.fund_challenges %}
+                <div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-lau-navy">{{ row.label }}</span>
+                    <span class="font-semibold text-lau-navy">{{ row.total }}</span>
+                  </div>
+                  <div class="mt-1 h-3 overflow-hidden rounded-full bg-lau-cream">
+                    <div class="h-full rounded-full bg-red-600" style="width: {{ row.percent }}%"></div>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">E sega ni toqai na bolebole.</p>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section class="rounded-md bg-lau-white p-5 shadow-sm">
+            <h2 class="font-display text-xl text-lau-navy">Veisiko ena vei Korokoro</h2>
+            <div class="mt-4 grid gap-3">
+              {% for row in analysis.village_visits.by_village %}
+                <div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-lau-navy">{{ row.label }}</span>
+                    <span class="font-semibold text-lau-navy">{{ row.total }}</span>
+                  </div>
+                  <div class="mt-1 h-3 overflow-hidden rounded-full bg-lau-cream">
+                    <div class="h-full rounded-full bg-lau-ocean" style="width: {{ row.percent }}%"></div>
+                  </div>
+                </div>
+              {% empty %}
+                <p class="text-sm text-lau-muted">Se bera ni dua na veisiko.</p>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
+
+        <section class="mt-6 rounded-md bg-lau-white p-5 shadow-sm">
+          <h2 class="font-display text-xl text-lau-navy">Ripote ena Veigauna</h2>
+
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="text-left text-lau-muted">
+                  <th class="py-2 pr-3">Vulatolu</th>
+                  <th class="py-2 pr-3">Tikina</th>
+                  <th class="py-2 pr-3">Lewe ni Tikina</th>
+                  <th class="py-2 pr-3">Soli</th>
+                  <th class="py-2 pr-3">Bose</th>
+                  <th class="py-2 pr-3">Veisiko</th>
+                  <th class="py-2">Veileti</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-lau-navy/10">
+                {% for row in analysis.all_time.latest_rows %}
+                  <tr>
+                    <td class="py-2 pr-3 font-semibold text-lau-navy">{{ row.period }}</td>
+                    <td class="py-2 pr-3 text-lau-navy">{{ row.tikina }}</td>
+                    <td class="py-2 pr-3 text-lau-navy">{{ row.population|intcomma }}</td>
+                    <td class="py-2 pr-3 text-lau-navy">${{ row.soli|floatformat:2 }}</td>
+                    <td class="py-2 pr-3 text-lau-navy">{{ row.bose|intcomma }}</td>
+                    <td class="py-2 pr-3 text-lau-navy">{{ row.visits|intcomma }}</td>
+                    <td class="py-2 text-lau-navy">{{ row.disputes|intcomma }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="7" class="py-4 text-lau-muted">Se bera na ripote.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
     </div>
+
   </div>
 </section>
 {% endblock %}

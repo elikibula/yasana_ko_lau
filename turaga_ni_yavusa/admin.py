@@ -10,7 +10,7 @@ class SignatureInline(admin.TabularInline):
 
 @admin.register(TNYReport)
 class TNYReportAdmin(admin.ModelAdmin):
-    list_display = ("yavusa", "vanua", "quarter", "year", "status", "submitted_at", "owner")
+    list_display = ("yavusa", "vanua", "koro", "tikina", "quarter", "year", "status", "submitted_at", "owner")
     list_filter = ("status", "quarter", "year")
-    search_fields = ("yavusa", "vanua", "mataqali", "tokatoka", "full_name", "owner__username")
+    search_fields = ("yavusa", "vanua", "mataqali", "tokatoka", "full_name", "phone_number", "email", "koro", "tikina", "owner__username")
     inlines = [SignatureInline]

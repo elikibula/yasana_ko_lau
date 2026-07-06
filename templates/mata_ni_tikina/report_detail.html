@@ -1,13 +1,61 @@
 {% extends "base.html" %}
-{% block title %}Report Detail{% endblock %}
+{% block title %}Mata ni Jikina Report Detail{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-6xl px-4 py-8">
   <div class="rounded-lg bg-lau-navy p-6 text-lau-cream">
     <p class="text-sm font-semibold uppercase text-lau-gold">{{ report.quarter }} {{ report.year }}</p>
     <h1 class="font-display text-3xl">{{ report }}</h1>
     <div class="mt-4 flex flex-wrap gap-2">{% for label,value in stats %}<span class="rounded-full bg-white/10 px-4 py-2 text-sm">{{ label }}: {{ value }}</span>{% endfor %}</div>
+    {% if can_export_report %}
+      {% if request.resolver_match.namespace == "turaga_ni_yavusa" %}
+        <a href="{% url 'turaga_ni_yavusa:report_pdf' report.pk %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">Export PDF</a>
+      {% else %}
+        <a href="{% url 'mata_ni_tikina:report_pdf' report.pk %}" class="mt-5 inline-flex rounded-md bg-lau-gold px-4 py-2 text-sm font-semibold text-lau-navy">Export PDF</a>
+      {% endif %}
+    {% else %}
+      <p class="mt-4 text-sm text-lau-cream/80">Ena rawa ni export taki na PDF ni sa vakadonuya oti na Roko Tui.</p>
+    {% endif %}
   </div>
   <div class="mt-6 grid gap-6">
+    {% if workflow_actions %}
+      <section class="rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Roko Tui Approval</p>
+        <h2 class="mt-1 font-display text-xl text-lau-navy">Veivakadonui ni Ripote</h2>
+        <form method="post" class="mt-4 grid gap-4">
+          {% csrf_token %}
+          <label class="block text-sm font-semibold text-lau-navy">Vakamacala{{ approval_form.comment }}</label>
+          <label class="flex items-start gap-3 text-sm text-lau-navy">{{ approval_form.acknowledge }}<span>Au vakadeitaka na noqu vakadonuya vakadigital na iTavi qo.</span></label>
+          <div class="flex flex-wrap gap-3">
+            {% for action in workflow_actions %}
+              {% if request.resolver_match.namespace == "turaga_ni_yavusa" %}
+                <button formaction="{% url 'turaga_ni_yavusa:report_workflow_action' report.pk action.type %}" class="rounded-md bg-lau-navy px-4 py-2 text-sm font-semibold text-lau-gold" type="submit">{{ action.label }}</button>
+              {% else %}
+                <button formaction="{% url 'mata_ni_tikina:report_workflow_action' report.pk action.type %}" class="rounded-md bg-lau-navy px-4 py-2 text-sm font-semibold text-lau-gold" type="submit">{{ action.label }}</button>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </form>
+      </section>
+    {% endif %}
+    <section class="rounded-md bg-lau-white p-5 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Audit Trail</p>
+      <h2 class="mt-1 font-display text-xl text-lau-navy">iTukutuku ni Veivakadonui</h2>
+      <div class="mt-4 grid gap-3">
+        {% for item in approval_actions %}
+          <div class="rounded-md border border-lau-cream p-4">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <p class="font-semibold text-lau-navy">{{ item.get_action_type_display }} - {{ item.user_full_name }}</p>
+              <p class="text-sm text-lau-muted">{{ item.created_at|date:"d M Y H:i" }}</p>
+            </div>
+            <p class="mt-1 text-sm text-lau-muted">{{ item.user_role }}</p>
+            {% if item.comment %}<p class="mt-3 text-sm leading-6 text-lau-navy">{{ item.comment }}</p>{% endif %}
+            <p class="mt-3 rounded-md bg-lau-cream p-3 text-xs leading-5 text-lau-muted">{{ item.digital_acknowledgement }}</p>
+          </div>
+        {% empty %}
+          <p class="rounded-md border-2 border-dashed border-lau-navy/20 p-4 text-sm text-lau-muted">E se bera ni dua na veivakadonui e volai.</p>
+        {% endfor %}
+      </div>
+    </section>
     {% for title, items in sections %}
       <section class="rounded-md bg-lau-white p-5 shadow-sm">
         <h2 class="font-display text-xl text-lau-navy">{{ title }}</h2>

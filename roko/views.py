@@ -22,9 +22,9 @@ def dashboard(request):
 
     recent = sorted(
         chain(
-            ((r.created_at, "Turaga ni Koro", r.village, r.quarter, r.year, "turani:report_detail", r.pk) for r in tnk_reports[:8]),
-            ((r.created_at, "Mata ni Tikina", r.tikina, r.quarter, r.year, "mata_ni_tikina:report_detail", r.pk) for r in mata_reports[:8]),
-            ((r.created_at, "Turaga ni Yavusa", r.yavusa, r.quarter, r.year, "turaga_ni_yavusa:report_detail", r.pk) for r in yavusa_reports[:8]),
+            ((r.created_at, "Turaga ni Koro", r.village, r.quarter, r.year, "turani:report_detail", "turani:report_pdf", r.pk) for r in tnk_reports[:8]),
+            ((r.created_at, "Mata ni Tikina", r.tikina, r.quarter, r.year, "mata_ni_tikina:report_detail", "mata_ni_tikina:report_pdf", r.pk) for r in mata_reports[:8]),
+            ((r.created_at, "Turaga ni Yavusa", r.yavusa, r.quarter, r.year, "turaga_ni_yavusa:report_detail", "turaga_ni_yavusa:report_pdf", r.pk) for r in yavusa_reports[:8]),
         ),
         key=lambda item: item[0],
         reverse=True,
@@ -57,5 +57,9 @@ def dashboard(request):
         .order_by("owner__first_name", "owner__last_name"),
         "role_counts": role_counts,
         "recent_reports": recent,
+        "assistant_roko_queue": tnk_reports.filter(status=TNKReport.STATUS_SUBMITTED_TO_ASSISTANT),
+        "final_approval_queue": tnk_reports.filter(status=TNKReport.STATUS_SUBMITTED_TO_ROKO),
+        "final_approved_reports": tnk_reports.filter(status=TNKReport.STATUS_FINAL_APPROVED),
+        "closed_reports": tnk_reports.filter(status__in=[TNKReport.STATUS_REJECTED, TNKReport.STATUS_ARCHIVED]),
     }
     return render(request, "roko/dashboard.html", context)

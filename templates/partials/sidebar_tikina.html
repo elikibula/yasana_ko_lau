@@ -1,9 +1,84 @@
-<aside class="rounded-md bg-lau-navy p-3 text-lau-cream md:sticky md:top-4">
-  <nav class="grid gap-1 text-sm font-semibold">
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.url_name == 'tikina_dashboard' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'tikina_dashboard' %}">Tikina Overview</a>
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'turani' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'turani:report_list' %}">View Koro Reports</a>
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'mata_ni_tikina' and request.resolver_match.url_name == 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'mata_ni_tikina:report_create' %}">Submit Tikina Report</a>
-    <a class="min-h-11 rounded px-3 py-3 {% if request.resolver_match.namespace == 'mata_ni_tikina' and request.resolver_match.url_name != 'report_create' %}bg-white/10 text-lau-gold{% else %}hover:bg-white/10{% endif %}" href="{% url 'mata_ni_tikina:report_list' %}">My Submissions</a>
-    <a class="min-h-11 rounded px-3 py-3 hover:bg-white/10" href="{% url 'documents:list' %}">Downloads</a>
+<aside class="rounded-xl bg-lau-navy p-4 text-lau-cream shadow-lg md:sticky md:top-4">
+
+  <div class="mb-4 border-b border-lau-gold/30 pb-3">
+    <h2 class="font-display text-lg text-lau-gold">
+      Mata ni Tikina
+    </h2>
+    <p class="mt-1 text-xs text-lau-cream/70">
+      Navigation Menu
+    </p>
+  </div>
+
+  <nav class="grid gap-2 text-sm font-semibold">
+
+    <!-- Dashboard -->
+    <a
+      href="{% url 'accounts:dashboard' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.url_name == 'dashboard' %}
+        bg-lau-gold text-lau-navy shadow-md
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <!-- TNK Reports -->
+    <a
+      href="{% url 'turani:report_list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'turani' %}
+        bg-white/10 text-lau-gold
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-file-lines w-5 text-center"></i>
+      <span>Odratou Ripote a Turaga ni Koro</span>
+    </a>
+
+    <!-- Create Report -->
+    <a
+      href="{% url 'mata_ni_tikina:report_create' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'mata_ni_tikina' and request.resolver_match.url_name == 'report_create' %}
+        bg-white/10 text-lau-gold
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-file-circle-plus w-5 text-center"></i>
+      <span>Vola dua Qou Ripote Vou</span>
+    </a>
+
+    <!-- Report List -->
+    <a
+      href="{% url 'mata_ni_tikina:report_list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200
+      {% if request.resolver_match.namespace == 'mata_ni_tikina' and request.resolver_match.url_name == 'report_list' %}
+        bg-white/10 text-lau-gold
+      {% else %}
+        hover:bg-white/10 hover:text-lau-gold
+      {% endif %}">
+      <i class="fa-solid fa-folder-open w-5 text-center"></i>
+      <span>List ni Qou Ripote</span>
+    </a>
+
+    <!-- Downloads -->
+    <a
+      href="{% url 'documents:list' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200 hover:bg-white/10 hover:text-lau-gold">
+      <i class="fa-solid fa-download w-5 text-center"></i>
+      <span>Downloads</span>
+    </a>
+
+    <!-- Help -->
+    <a
+      href="{% url 'public:contact' %}"
+      class="flex min-h-11 items-center gap-3 rounded-lg px-3 py-3 transition-all duration-200 hover:bg-white/10 hover:text-lau-gold">
+      <i class="fa-solid fa-circle-question w-5 text-center"></i>
+      <span>Help &amp; Contact</span>
+    </a>
+
   </nav>
+
 </aside>
