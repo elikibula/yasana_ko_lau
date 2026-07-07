@@ -148,8 +148,19 @@ class MNTApprovalAction(models.Model):
         (ACTION_COMMENT, "Comment"),
     )
 
-    report = models.ForeignKey(MNTReport, on_delete=models.PROTECT, related_name="approval_actions")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="mnt_approval_actions")
+    report = models.ForeignKey(
+        MNTReport,
+        on_delete=models.CASCADE,
+        related_name="approval_actions"
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="mnt_approval_actions"
+    )
     user_full_name = models.CharField(max_length=150)
     user_role = models.CharField(max_length=100)
     action_type = models.CharField(max_length=30, choices=ACTION_CHOICES)
