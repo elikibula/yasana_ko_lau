@@ -5,8 +5,8 @@
       <a href="{% url 'public:home' %}" class="flex min-w-0 items-center gap-3 rounded-md outline-none transition hover:text-lau-gold focus-visible:ring-2 focus-visible:ring-lau-gold" aria-label="Yasana ko Lau home">
         <img src="{% static 'images/logo_lau.png' %}" alt="Yasana ko Lau Crest" class="h-12 w-12 rounded-full bg-lau-white object-contain p-1 ring-2 ring-lau-gold/35">
         <span class="min-w-0">
-          <span class="block font-display text-xl leading-tight text-lau-gold">Yasana ko Lau</span>
-          <span class="block text-xs text-lau-cream/70">Lau Provincial Council</span>
+          <span class="block truncate font-display text-lg leading-tight text-lau-gold sm:text-xl">Yasana ko Lau</span>
+          <span class="block truncate text-xs text-lau-cream/70">Lau Provincial Council</span>
         </span>
       </a>
 
@@ -56,7 +56,8 @@
         </a>
       </nav>
 
-      <div class="flex items-center gap-2" aria-label="Polotu audio controls">
+      <!-- Polotu audio controls: desktop-only in the top bar. On mobile these live inside the drawer instead, so the header row never gets crowded. -->
+      <div class="hidden items-center gap-2 md:flex" aria-label="Polotu audio controls">
         <audio id="polotuAudio" src="{% static 'audio/Malie_Polotu.mp3' %}" preload="none" loop></audio>
         <button id="audioPlayToggle" class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-lau-gold/60 bg-lau-gold/10 text-lg text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy focus:outline-none focus:ring-2 focus:ring-lau-gold focus:ring-offset-2 focus:ring-offset-lau-navy" type="button" aria-label="Play polotu" aria-pressed="false" title="Play polotu">
           <span aria-hidden="true">&#9658;</span>
@@ -99,44 +100,80 @@
         {% endif %}
       </div>
 
-      <button id="navToggle" class="grid min-h-11 min-w-11 place-items-center rounded-md border border-lau-gold/50 text-2xl text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy md:hidden" aria-label="Open menu" aria-expanded="false">
-        <span aria-hidden="true">&#9776;</span>
+      <!-- Hamburger: morphs into an X via two spans, no icon-swap flash -->
+      <button id="navToggle" type="button" class="relative grid min-h-11 min-w-11 place-items-center rounded-md border border-lau-gold/50 text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy md:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span class="pointer-events-none relative block h-4 w-5">
+          <span class="hamburger-bar absolute left-0 top-0 h-0.5 w-5 rounded-full bg-current transition-all duration-300"></span>
+          <span class="hamburger-bar absolute left-0 top-1.5 h-0.5 w-5 rounded-full bg-current transition-all duration-300"></span>
+          <span class="hamburger-bar absolute left-0 top-3 h-0.5 w-5 rounded-full bg-current transition-all duration-300"></span>
+        </span>
       </button>
     </div>
   </div>
 </header>
 
-<div id="mobileMenu" class="fixed inset-0 z-50 hidden bg-lau-navy/95 text-lau-cream backdrop-blur md:hidden">
-  <div class="flex min-h-screen flex-col px-5 py-5">
-    <div class="flex items-center justify-between">
-      <a href="{% url 'public:home' %}" class="flex items-center gap-3 rounded-md transition hover:text-lau-gold">
-        <img src="{% static 'images/logo_lau.png' %}" alt="Yasana ko Lau Crest" class="h-12 w-12 rounded-full bg-lau-white object-contain p-1 ring-2 ring-lau-gold/35">
-        <span class="font-display text-xl text-lau-gold">Yasana ko Lau</span>
+<!-- Backdrop -->
+<div id="mobileMenuBackdrop" class="fixed inset-0 z-40 hidden bg-lau-navy/60 opacity-0 backdrop-blur-sm transition-opacity duration-300 md:hidden"></div>
+
+<!-- Drawer -->
+<div id="mobileMenu" class="fixed inset-y-0 right-0 z-50 hidden w-full max-w-sm translate-x-full transform bg-lau-navy text-lau-cream shadow-2xl shadow-black/40 transition-transform duration-300 ease-out md:hidden" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+  <div class="flex h-full flex-col overflow-y-auto" style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
+
+    <div class="flex items-center justify-between border-b border-lau-gold/20 px-5 py-4">
+      <a href="{% url 'public:home' %}" class="flex items-center gap-3">
+        <img src="{% static 'images/logo_lau.png' %}" alt="Yasana ko Lau Crest" class="h-10 w-10 rounded-full bg-lau-white object-contain p-1 ring-2 ring-lau-gold/35">
+        <span class="font-display text-lg text-lau-gold">Yasana ko Lau</span>
       </a>
-      <button id="closeMobileMenu" class="grid min-h-11 min-w-11 place-items-center rounded-md border border-lau-gold/50 text-2xl text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy" aria-label="Close menu">
+      <button id="closeMobileMenu" type="button" class="grid min-h-11 min-w-11 place-items-center rounded-full border border-lau-gold/50 text-2xl leading-none text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy" aria-label="Close menu">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
 
-    <nav class="mt-10 grid gap-2 text-lg font-semibold" aria-label="Mobile navigation">
+    <!-- masi accent divider -->
+    <div class="h-1 w-full bg-gradient-to-r from-lau-gold/80 via-lau-gold/20 to-transparent"></div>
+
+    {% if user.is_authenticated %}
+      <div class="mx-5 mt-5 flex items-center gap-3 rounded-lg border border-lau-gold/25 bg-white/5 px-4 py-3 drawer-item">
+        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-lau-gold text-sm font-bold uppercase text-lau-navy">
+          {{ user.first_name|default:user.username|slice:":1" }}
+        </span>
+        <span class="min-w-0">
+          <span class="block truncate font-semibold text-lau-cream">{{ user.get_full_name|default:user.username }}</span>
+          <span class="block text-xs text-lau-gold">{{ current_role_label }}</span>
+        </span>
+      </div>
+    {% endif %}
+
+    <nav class="mt-3 flex flex-col gap-1 px-3 text-base font-semibold" aria-label="Mobile navigation">
       {% if user.is_authenticated %}
-        <a href="{% url 'accounts:dashboard' %}" class="min-h-12 rounded-md bg-lau-gold px-4 py-3 text-lau-navy transition hover:bg-lau-cream">Dashboard</a>
+        <a href="{% url 'accounts:dashboard' %}" class="drawer-item min-h-12 rounded-lg bg-lau-gold px-4 py-3 text-lau-navy transition hover:bg-lau-cream">Dashboard</a>
       {% endif %}
-      <a href="{% url 'public:home' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Home</a>
-      <a href="{% url 'public:about' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Ko Lau</a>
-      <a href="{% url 'tikina:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Jikina</a>
-      <a href="{% url 'news:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">News</a>
-      <a href="{% url 'events:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Events</a>
-      <a href="{% url 'documents:list' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Resources</a>
-      <a href="{% url 'public:contact' %}" class="min-h-12 rounded-md px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Contact</a>
+      <a href="{% url 'public:home' %}" class="drawer-item min-h-12 rounded-lg px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold {% if request.path == '/' %}bg-white/10 text-lau-gold{% endif %}">Home</a>
+      <a href="{% url 'public:about' %}" class="drawer-item min-h-12 rounded-lg px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold {% if request.path == '/about/' %}bg-white/10 text-lau-gold{% endif %}">Ko Lau</a>
+      <a href="{% url 'tikina:list' %}" class="drawer-item min-h-12 rounded-lg px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold {% if request.path == '/tikina/' %}bg-white/10 text-lau-gold{% endif %}">Jikina</a>
+
+      <p class="drawer-item mt-3 px-4 text-xs font-semibold uppercase tracking-wide text-lau-gold/70">Resources</p>
+      <a href="{% url 'news:list' %}" class="drawer-item min-h-12 rounded-lg px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Talanoa kei na Tukutuku eso</a>
+      <a href="{% url 'events:list' %}" class="drawer-item min-h-12 rounded-lg px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Events</a>
+      <a href="{% url 'documents:list' %}" class="drawer-item min-h-12 rounded-lg px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold">Documents</a>
+
+      <a href="{% url 'public:contact' %}" class="drawer-item mt-3 min-h-12 rounded-lg px-4 py-3 transition hover:bg-white/10 hover:text-lau-gold {% if request.path == '/contact/' %}bg-white/10 text-lau-gold{% endif %}">Contact</a>
     </nav>
 
-    <div class="mt-auto grid gap-3 border-t border-lau-gold/30 pt-5">
+    <!-- Polotu audio controls, mobile only -->
+    <div class="drawer-item mt-4 flex items-center gap-3 px-5" aria-label="Polotu audio controls">
+      <audio id="polotuAudioMobile" src="{% static 'audio/Malie_Polotu.mp3' %}" preload="none" loop></audio>
+      <button id="audioPlayToggleMobile" class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-lau-gold/60 bg-lau-gold/10 text-lg text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy" type="button" aria-label="Play polotu" aria-pressed="false" title="Play polotu">
+        <span aria-hidden="true">&#9658;</span>
+      </button>
+      <button id="audioMuteToggleMobile" class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-lau-gold/60 bg-lau-gold/10 text-lg text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy" type="button" aria-label="Mute polotu" aria-pressed="false" title="Mute polotu">
+        <span aria-hidden="true">&#128266;</span>
+      </button>
+      <span class="text-xs text-lau-cream/60">Malie Polotu</span>
+    </div>
+
+    <div class="mt-auto grid gap-3 border-t border-lau-gold/20 px-5 py-5 drawer-item">
       {% if user.is_authenticated %}
-        <div class="rounded-lg border border-lau-gold/20 bg-white/5 px-4 py-3">
-          <p class="font-semibold">{{ user.get_full_name|default:user.username }}</p>
-          <p class="mt-1 text-xs text-lau-gold">{{ current_role_label }}</p>
-        </div>
         <a href="{% url 'accounts:profile' %}" class="min-h-12 rounded-md border border-lau-gold/40 px-4 py-3 text-center font-semibold text-lau-gold transition hover:bg-lau-gold hover:text-lau-navy">Update my profile</a>
         <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}
@@ -148,3 +185,119 @@
     </div>
   </div>
 </div>
+
+<style>
+  /* Staggered reveal for drawer items once .menu-open is applied to #mobileMenu */
+  #mobileMenu .drawer-item {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  #mobileMenu.menu-open .drawer-item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #navToggle.is-open .hamburger-bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  #navToggle.is-open .hamburger-bar:nth-child(2) { opacity: 0; }
+  #navToggle.is-open .hamburger-bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    #mobileMenu, #mobileMenuBackdrop, #mobileMenu .drawer-item, .hamburger-bar {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var navToggle = document.getElementById('navToggle');
+    var closeBtn = document.getElementById('closeMobileMenu');
+    var menu = document.getElementById('mobileMenu');
+    var backdrop = document.getElementById('mobileMenuBackdrop');
+    if (!navToggle || !menu || !backdrop) return;
+
+    var drawerItems = menu.querySelectorAll('.drawer-item');
+    drawerItems.forEach(function (el, i) {
+      el.style.transitionDelay = (i * 30) + 'ms';
+    });
+
+    function openMenu() {
+      menu.classList.remove('hidden');
+      backdrop.classList.remove('hidden');
+      // force reflow so the transition runs
+      void menu.offsetWidth;
+      menu.classList.remove('translate-x-full');
+      menu.classList.add('menu-open');
+      backdrop.classList.remove('opacity-0');
+      navToggle.classList.add('is-open');
+      navToggle.setAttribute('aria-expanded', 'true');
+      navToggle.setAttribute('aria-label', 'Close menu');
+      document.body.style.overflow = 'hidden';
+      var firstLink = menu.querySelector('a, button');
+      if (firstLink) firstLink.focus({ preventScroll: true });
+    }
+
+    function closeMenu() {
+      menu.classList.add('translate-x-full');
+      menu.classList.remove('menu-open');
+      backdrop.classList.add('opacity-0');
+      navToggle.classList.remove('is-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+      navToggle.setAttribute('aria-label', 'Open menu');
+      document.body.style.overflow = '';
+      window.setTimeout(function () {
+        if (menu.classList.contains('translate-x-full')) {
+          menu.classList.add('hidden');
+          backdrop.classList.add('hidden');
+        }
+      }, 300);
+      navToggle.focus({ preventScroll: true });
+    }
+
+    navToggle.addEventListener('click', function () {
+      var isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+      isOpen ? closeMenu() : openMenu();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+    backdrop.addEventListener('click', closeMenu);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && navToggle.getAttribute('aria-expanded') === 'true') closeMenu();
+    });
+    menu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+
+    // Polotu audio: wire both desktop and mobile control sets to whichever <audio> exists
+    function wireAudio(playBtn, muteBtn, audioEl) {
+      if (!playBtn || !muteBtn || !audioEl) return;
+      playBtn.addEventListener('click', function () {
+        if (audioEl.paused) {
+          audioEl.play();
+          playBtn.setAttribute('aria-pressed', 'true');
+          playBtn.innerHTML = '<span aria-hidden="true">&#10074;&#10074;</span>';
+        } else {
+          audioEl.pause();
+          playBtn.setAttribute('aria-pressed', 'false');
+          playBtn.innerHTML = '<span aria-hidden="true">&#9658;</span>';
+        }
+      });
+      muteBtn.addEventListener('click', function () {
+        audioEl.muted = !audioEl.muted;
+        muteBtn.setAttribute('aria-pressed', audioEl.muted ? 'true' : 'false');
+        muteBtn.innerHTML = audioEl.muted
+          ? '<span aria-hidden="true">&#128263;</span>'
+          : '<span aria-hidden="true">&#128266;</span>';
+      });
+    }
+    wireAudio(
+      document.getElementById('audioPlayToggle'),
+      document.getElementById('audioMuteToggle'),
+      document.getElementById('polotuAudio')
+    );
+    wireAudio(
+      document.getElementById('audioPlayToggleMobile'),
+      document.getElementById('audioMuteToggleMobile'),
+      document.getElementById('polotuAudioMobile')
+    );
+  })();
+</script>
