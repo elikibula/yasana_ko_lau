@@ -17,7 +17,7 @@ from turani.analytics import tnk_dashboard_analysis
 from turani.models import Business, HousingCount, PopulationAgeGroup, TNKReport
 
 from .analytics import tny_dashboard_analysis
-from .forms import SignatureFormSet, TNY_FIJIAN_INLINE_LABELS, TNY_FORMSET_TITLES, TNY_SECTIONS, TNYReportForm
+from .forms import SignatureFormSet, TNY_FIJIAN_INLINE_LABELS, TNY_SECTIONS, TNYReportForm
 from .models import Signature, TNYApprovalAction, TNYReport
 
 
@@ -95,7 +95,6 @@ def _report_form_blocks(form, formsets):
     for title, names in TNY_SECTIONS:
         blocks.append({"type": "chapter", "title": title})
         blocks.append({"type": "section", "title": title, "fields": _form_fields(form, names)})
-    blocks.append({"type": "formset", "key": "signatures", "title": TNY_FORMSET_TITLES["signatures"], "formset": formsets["signatures"]})
     return blocks
 
 
@@ -345,7 +344,7 @@ def report_pdf(request, pk):
             ("Siga ni vakau", report.submitted_at.strftime("%d %b %Y") if report.submitted_at else "-"),
         ],
         sections=_detail_sections(report),
-        child_sections=[("Vakadinadina", _model_rows(report.signatures.all()))],
+        child_sections=[],
         audit_rows=_audit_trail_rows(report),
         filename=f"turaga-ni-yavusa-{report.yavusa}-{report.quarter}-{report.year}.pdf".replace(" ", "-").lower(),
     )

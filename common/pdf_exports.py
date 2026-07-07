@@ -76,21 +76,22 @@ class ReportPdf:
         self.page = Image.new("RGB", (PAGE_WIDTH, PAGE_HEIGHT), CREAM)
         self.draw = ImageDraw.Draw(self.page)
         self.pages.append(self.page)
+        self._content_start_y = 185
         self._draw_bands()
         self._draw_header(first=first)
-        self.y = 370 if first else 210
+        self.y = self._content_start_y
 
     def _draw_bands(self):
         colors = [NAVY, GOLD, EARTH, GOLD]
         block = PAGE_WIDTH // 24
         for i in range(24):
             self.draw.rectangle((i * block, 0, (i + 1) * block, 28), fill=colors[i % len(colors)])
-            self.draw.rectangle((i * block, PAGE_HEIGHT - 28, (i + 1) * block, PAGE_HEIGHT), fill=colors[(i + 1) % len(colors)])
 
     def _draw_header(self, first=False):
         self.draw.rectangle((0, 28, PAGE_WIDTH, 172 if first else 145), fill=NAVY)
         logo_path = Path(settings.BASE_DIR) / "static" / "images" / "LauLogo.png"
-        if logo_path.exists():
+        text_x = MARGIN
+        if first and logo_path.exists():
             with Image.open(logo_path) as logo:
                 logo.thumbnail((112, 112))
                 x = MARGIN
@@ -99,14 +100,15 @@ class ReportPdf:
                     self.page.paste(logo, (x, y), logo)
                 else:
                     self.page.paste(logo.convert("RGB"), (x, y))
-        self.draw.text((MARGIN + 135, 58), "YASANA KO LAU", font=FONT_H1, fill=GOLD)
-        self.draw.text((MARGIN + 135, 96), "Provincial Council Report", font=FONT_BODY, fill=CREAM)
+            text_x = MARGIN + 135
+        self.draw.text((text_x, 58), "YASANA KO LAU", font=FONT_H1, fill=GOLD)
+        self.draw.text((text_x, 96), "Provincial Council Report", font=FONT_BODY, fill=CREAM)
         self.draw.text((PAGE_WIDTH - MARGIN - 120, 96), f"Page {self.page_number}", font=FONT_SMALL, fill=CREAM)
         if first:
             self.draw.text((MARGIN, 210), self.title, font=FONT_TITLE, fill=NAVY)
             for index, line in enumerate(_wrap(self.draw, self.subtitle, FONT_BODY, PAGE_WIDTH - (MARGIN * 2))[:3]):
                 self.draw.text((MARGIN, 270 + (index * 28)), line, font=FONT_BODY, fill=TEXT)
-            self._draw_meta_box(330)
+            self._content_start_y = self._draw_meta_box(330) + 44
 
     def _draw_meta_box(self, y):
         box_h = 26 + (len(self.meta_rows) * 30)
@@ -116,6 +118,7 @@ class ReportPdf:
             self.draw.text((MARGIN + 24, cy), _text(label).upper(), font=FONT_SMALL_BOLD, fill=EARTH)
             self.draw.text((MARGIN + 260, cy), _text(value), font=FONT_SMALL, fill=TEXT)
             cy += 30
+        return y + box_h
 
     def _ensure_space(self, needed):
         if self.y + needed > PAGE_HEIGHT - 90:
@@ -130,25 +133,32 @@ class ReportPdf:
         self.draw.text((MARGIN + 18, self.y + 14), _text(title), font=FONT_H2, fill=GOLD)
         self.y += 70
 
-    def key_values(self, rows):
-        label_w = 360
-        value_w = PAGE_WIDTH - (MARGIN * 2) - label_w - 32
-        for label, value in rows:
-            label_lines = _wrap(self.draw, label, FONT_SMALL_BOLD, label_w - 24)
-            value_lines = _wrap(self.draw, value, FONT_BODY, value_w - 24)
-            line_count = max(len(label_lines), len(value_lines))
-            row_h = max(48, 18 + (line_count * 25))
-            self._ensure_space(row_h + 8)
-            self.draw.rounded_rectangle((MARGIN, self.y, PAGE_WIDTH - MARGIN, self.y + row_h), radius=6, fill=(255, 255, 255), outline=LINE)
-            ly = self.y + 14
-            for line in label_lines:
-                self.draw.text((MARGIN + 16, ly), line, font=FONT_SMALL_BOLD, fill=EARTH)
-                ly += 22
-            vy = self.y + 14
-            for line in value_lines:
-                self.draw.text((MARGIN + label_w + 16, vy), line, font=FONT_BODY, fill=TEXT)
-                vy += 25
-            self.y += row_h + 8
+    def _card_height(self, label, value, width):
+        label_lines = _wrap(self.draw, _text(label).upper(), FONT_SMALL_BOLD, width - 32)
+        value_lines = _wrap(self.draw, value, FONT_BODY, width - 32)
+        return max(84, 28 + (len(label_lines) * 18) + 8 + (len(value_lines) * 25)), label_lines, value_lines
+
+    def key_values(self, rows, columns=2):
+        gap = 18
+        content_w = PAGE_WIDTH - (MARGIN * 2)
+        card_w = (content_w - (gap * (columns - 1))) // columns
+        for start in range(0, len(rows), columns):
+            row = rows[start:start + columns]
+            cards = [self._card_height(label, value, card_w) for label, value in row]
+            row_h = max(card[0] for card in cards)
+            self._ensure_space(row_h + 10)
+            for index, ((label, value), (_, label_lines, value_lines)) in enumerate(zip(row, cards)):
+                x = MARGIN + (index * (card_w + gap))
+                self.draw.rounded_rectangle((x, self.y, x + card_w, self.y + row_h), radius=6, fill=(255, 255, 255), outline=LINE)
+                ly = self.y + 14
+                for line in label_lines:
+                    self.draw.text((x + 16, ly), line, font=FONT_SMALL_BOLD, fill=EARTH)
+                    ly += 18
+                vy = ly + 8
+                for line in value_lines:
+                    self.draw.text((x + 16, vy), line, font=FONT_BODY, fill=TEXT)
+                    vy += 25
+            self.y += row_h + 10
 
     def child_rows(self, rows):
         if not rows:
@@ -158,14 +168,14 @@ class ReportPdf:
             self._ensure_space(42)
             self.draw.text((MARGIN, self.y), f"Record {index}", font=FONT_BODY_BOLD, fill=NAVY)
             self.y += 32
-            self.key_values(row)
+            self.key_values(row, columns=1)
             self.y += 8
 
     def audit_trail(self, rows):
         self.page_break()
         self.section("Audit Trail")
         if not rows:
-            self.key_values([("iTukutuku", "E se bera ni dua na veivakadonui e volai.")])
+            self.key_values([("iTukutuku", "E se bera ni dua na veivakadonui e volai.")], columns=1)
             return
         self.child_rows(rows)
 

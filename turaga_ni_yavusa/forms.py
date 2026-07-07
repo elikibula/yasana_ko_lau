@@ -93,6 +93,3 @@ TNY_SECTIONS = (
     ("NA VEISEMATI NI VANUA KEI NA VEIMATALOTU", ("churches_in_yavusa_count", "church_follows_vanua_program", "church_meets_vanua_needs")),
     ("BOLEBOLE KEI NA KAUWAI", ("yavusa_obligations", "mataqali_obligations", "tokatoka_obligations")),
 )
-
-
-TNY_FORMSET_TITLES = {"signatures": "VAKADINADINA"}
