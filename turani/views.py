@@ -1000,6 +1000,11 @@ def turaga_dashboard(request):
     reports = reports_for(request.user).order_by("-year", "-created_at")
     analysis = tnk_dashboard_analysis(reports)
 
+    profile, _ = TuragaProfile.objects.get_or_create(user=request.user)
+    village = profile.village
+    district = profile.district
+    province = profile.province
+
     population = PopulationAgeGroup.objects.filter(report__in=reports)
     offences = LawOffence.objects.filter(report__in=reports)
     health = HealthConditionCount.objects.filter(report__in=reports)
@@ -1007,6 +1012,11 @@ def turaga_dashboard(request):
     projects = IVDPProject.objects.filter(report__in=reports)
 
     context = {
+        "profile": profile,
+        "village": village,
+        "district": district,
+        "province": province,
+
         "total_reports": reports.count(),
         "total_population": population.aggregate(total=Sum("count"))["total"] or 0,
         "total_households": reports.aggregate(total=Sum("household_count"))["total"] or 0,
@@ -1048,7 +1058,13 @@ def turaga_dashboard(request):
         "workflow_queues": {
             "draft": reports.filter(status=TNKReport.STATUS_DRAFT),
             "returned": reports.filter(status=TNKReport.STATUS_RETURNED_TO_TURAGA),
-            "submitted": reports.exclude(status__in=[TNKReport.STATUS_DRAFT, TNKReport.STATUS_RETURNED_TO_TURAGA, TNKReport.STATUS_FINAL_APPROVED]),
+            "submitted": reports.exclude(
+                status__in=[
+                    TNKReport.STATUS_DRAFT,
+                    TNKReport.STATUS_RETURNED_TO_TURAGA,
+                    TNKReport.STATUS_FINAL_APPROVED,
+                ]
+            ),
             "final": reports.filter(status=TNKReport.STATUS_FINAL_APPROVED),
         },
         "workflow_role": role_for_user(request.user),
