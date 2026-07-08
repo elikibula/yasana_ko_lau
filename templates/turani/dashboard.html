@@ -13,13 +13,13 @@
       <div class="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.5fr_1fr] lg:p-10">
         <div>
           <p class="text-sm font-semibold uppercase tracking-wide text-lau-gold">Turaga ni Koro Dashboard</p>
-          <h1 class="mt-2 text-3xl font-bold text-white sm:text-4xl">Na iTuvaki ni Koro</h1>
+          <h1 class="mt-2 text-3xl font-bold text-white sm:text-4xl">Analysis ni omu Koro</h1>
           <p class="mt-4 max-w-3xl text-sm leading-6 text-white/80 sm:text-base">
             {{ analysis.summary_text }}
           </p>
         </div>
         <div class="rounded-lg bg-white/10 p-5 text-white">
-          <p class="text-sm font-semibold uppercase tracking-wide text-lau-gold">iTukutuku vou</p>
+          <p class="text-sm font-semibold uppercase tracking-wide text-lau-muted">iTukutuku vou</p>
           {% if analysis.overview.latest_report %}
             <p class="mt-3 text-2xl font-bold">{{ analysis.overview.latest_report.village }}</p>
             <p class="mt-1 text-sm text-white/75">
@@ -63,7 +63,7 @@
     </div>
 
     <section class="mt-6 rounded-lg border-2 border-lau-gold bg-lau-white p-6 shadow-sm">
-      <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Approval Queue</p>
+      <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Approval Queue</p>
       <h2 class="mt-1 text-xl font-bold text-lau-navy">Na ituvaki ni nomu ripote</h2>
       <div class="mt-4 grid gap-3 sm:grid-cols-4">
         <div class="rounded-md bg-lau-cream p-4"><p class="text-xs text-lau-muted">Draft</p><p class="text-2xl font-bold text-lau-navy">{{ workflow_queues.draft.count }}</p></div>
@@ -77,7 +77,7 @@
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
         <div class="flex items-center justify-between gap-4">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Summary</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Summary</p>
             <h2 class="mt-1 text-xl font-bold text-lau-navy">Nai tuvaki ena vei ya 3 na vula</h2>
           </div>
           <span class="rounded-full bg-lau-cream px-3 py-1 text-xs font-semibold text-lau-navy">
@@ -102,7 +102,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Recommendations</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Recommendations</p>
         <h2 class="mt-1 text-xl font-bold text-lau-navy">Na veika e gadrevi me vala!</h2>
         <div class="mt-4 space-y-3">
           {% for item in analysis.recommendations %}
@@ -122,7 +122,7 @@
 
     <div class="mt-6 grid gap-6 lg:grid-cols-3">
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">6.0 Population</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">6.0 Population</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Na lewe ni koro</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.population.summary }}</p>
         <div class="mt-4 space-y-2">
@@ -143,7 +143,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">7.0 Housing</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">7.0 Housing</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Vale kei na matavuvale</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.housing.summary }}</p>
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -169,7 +169,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">3.0 Committees</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">3.0 Committees</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Komiti ni koro</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.committees.summary }}</p>
         <div class="mt-4 grid grid-cols-2 gap-3">
@@ -195,7 +195,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">2.0 Law</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">2.0 Law</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Lewa bibi</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.law.summary }}</p>
         <div class="mt-4 grid grid-cols-2 gap-3">
@@ -221,7 +221,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">11.0 Water</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">11.0 Water</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Wai kei na bula savasava</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.water_sanitation.summary }}</p>
         <div class="mt-4 space-y-2">
@@ -247,7 +247,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">12.0 Health</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">12.0 Health</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Bula raraba</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.health.summary }}</p>
         <div class="mt-4 space-y-2">
@@ -266,7 +266,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">15.0 Crops</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">15.0 Crops</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Kakana kei na teitei</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.crops.summary }}</p>
         <div class="mt-4 space-y-2">
@@ -285,7 +285,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">14.0 IVDP</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">14.0 IVDP</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Veivakatorocaketaki</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.ivdp.summary }}</p>
         <div class="mt-4 grid grid-cols-2 gap-3">
@@ -311,7 +311,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">13.0 Business</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">13.0 Business</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Bisinisi</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.business.summary }}</p>
         <div class="mt-4 grid grid-cols-2 gap-3">
@@ -337,7 +337,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">18.0 Disaster</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">18.0 Disaster</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Leqa tubukoso</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.disaster_climate.summary }}</p>
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -360,7 +360,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">17.0 Culture</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">17.0 Culture</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">iTovo vakavanua</h2>
         <p class="mt-3 text-sm leading-6 text-lau-muted">{{ analysis.culture.summary }}</p>
         <div class="mt-4 grid grid-cols-3 gap-3">
@@ -390,7 +390,7 @@
       </div>
 
       <div class="rounded-lg bg-lau-white p-6 shadow-sm lg:col-span-2">
-        <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">4.0, 5.0, 8.0, 9.0, 10.0, 16.0</p>
+        <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">4.0, 5.0, 8.0, 9.0, 10.0, 16.0</p>
         <h2 class="mt-1 text-lg font-bold text-lau-navy">Other village indicators</h2>
         <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div class="rounded-md bg-lau-cream p-4">
@@ -430,7 +430,7 @@
     <div class="mt-6 rounded-lg bg-lau-white p-6 shadow-sm">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Latest reports</p>
+          <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Latest reports</p>
           <h2 class="mt-1 text-lg font-bold text-lau-navy">Recent submissions and drafts</h2>
         </div>
       </div>

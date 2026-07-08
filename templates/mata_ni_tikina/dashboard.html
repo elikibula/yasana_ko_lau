@@ -18,7 +18,7 @@
       <main class="min-w-0 flex-1">
 
         <div class="rounded-lg bg-lau-navy p-6 text-lau-cream shadow-lg">
-          <p class="text-sm font-semibold uppercase text-lau-gold">Mata ni Tikina Dashboard</p>
+          <p class="text-sm font-semibold uppercase text-lau-muted">Mata ni Tikina Dashboard</p>
           <h1 class="mt-2 font-display text-3xl">
             Malo a bula {{ request.user.get_full_name|default:request.user.username }}
           </h1>
@@ -40,7 +40,7 @@
         <section class="mt-6 rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm">
           <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Approval Queue</p>
+              <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Approval Queue</p>
               <h2 class="font-display text-xl text-lau-navy">
                 Ripote ni Turaga ni Koro ka vinakata a veivakadonui i Mata ni Jikina
               </h2>
@@ -103,8 +103,8 @@
           <section class="rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm lg:col-span-2">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Na ka e dodonu me raici taumada</p>
-                <h2 class="font-display text-xl text-lau-navy">iVakasala mai na ripote vou</h2>
+                <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">A veika ka gadreva omunu veiqaravi</p>
+                <h2 class="font-display text-xl text-lau-navy">iVakasala tauri mai na ripote vou</h2>
               </div>
               {% if analysis.latest.exists %}
                 <span class="rounded-md bg-lau-cream px-3 py-1 text-sm font-semibold text-lau-navy">
@@ -123,7 +123,7 @@
           </section>
 
           <section class="rounded-md bg-lau-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">Soli ni Jikina</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">Soli ni Yasana</p>
             <h2 class="font-display text-xl text-lau-navy">{{ analysis.latest.finance.soli_percent }}% sa kumuni</h2>
 
             <div class="mt-4 h-4 overflow-hidden rounded-full bg-lau-cream">
@@ -313,7 +313,7 @@
         </section>
 
         <section class="mt-6 rounded-md border-2 border-lau-gold bg-lau-white p-5 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wide text-lau-gold">
+          <p class="text-xs font-semibold uppercase tracking-wide text-lau-muted">
             Reference Data - mai na ripote ni Turaga ni Koro
           </p>
 
