@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.utils.text import slugify
@@ -71,6 +72,27 @@ class Koro(models.Model):
         if not self.slug:
             self.slug = f"{self.tikina.slug}-{slugify(self.name)}"
         super().save(*args, **kwargs)
+
+
+class KoroDroneVideo(models.Model):
+    koro = models.ForeignKey("Koro", related_name="drone_videos", on_delete=models.CASCADE)
+    title = models.CharField(max_length=200, blank=True)
+    video_file = models.FileField(upload_to="drone_videos/%Y/%m/", blank=True, null=True)
+    video_url = models.URLField(blank=True)
+    thumbnail = models.ImageField(upload_to="drone_videos/thumbnails/", blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "-uploaded_at"]
+
+    def clean(self):
+        super().clean()
+        if not self.video_file and not self.video_url:
+            raise ValidationError("Add either a video file or a video URL.")
+
+    def __str__(self):
+        return self.title or f"Drone video for {self.koro}"
 
 
 LEGACY_TIKINA_CHOICES = (

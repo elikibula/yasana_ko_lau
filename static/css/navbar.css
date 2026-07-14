@@ -1,0 +1,509 @@
+  /* ========================================================
+     PREMIUM STRONG MASI NAVBAR
+  ======================================================== */
+
+  .lau-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    isolation: isolate;
+    overflow: hidden;
+
+    background:
+      radial-gradient(
+        circle at 20% 0%,
+        rgba(225, 173, 37, 0.16) 0%,
+        transparent 42%
+      ),
+      linear-gradient(
+        180deg,
+        #0a567c 0%,
+        #07496d 30%,
+        #063d5c 68%,
+        #032d47 100%
+      );
+
+    border-bottom: 1px solid rgba(225, 173, 37, 0.42);
+
+    box-shadow:
+      0 8px 28px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(225, 173, 37, 0.16);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* ========================================================
+     MASI TEXTURE LAYER
+
+     Change opacity here:
+     0.20 = subtle
+     0.30 = medium
+     0.42 = strong
+     0.55 = very strong
+  ======================================================== */
+
+  .lau-navbar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    background-image:
+      url("{% static 'images/masiborder.png' %}");
+
+    background-repeat: repeat-x;
+    background-position: center center;
+    background-size: auto 115px;
+
+    opacity: 0.42;
+
+    mix-blend-mode: soft-light;
+
+    filter:
+      contrast(1.25)
+      saturate(0.85);
+
+    pointer-events: none;
+  }
+
+  /* Dark transparent layer keeps text readable */
+
+  .lau-navbar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(2, 37, 57, 0.30) 0%,
+        rgba(3, 48, 72, 0.12) 35%,
+        rgba(3, 48, 72, 0.08) 60%,
+        rgba(2, 37, 57, 0.32) 100%
+      );
+
+    pointer-events: none;
+  }
+
+  /*
+   * Keep all navbar content above the masi and gradient layers.
+   */
+
+  .lau-navbar > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ========================================================
+     SOFT LIGHT OVERLAY
+  ======================================================== */
+
+  .lau-navbar-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+
+    background:
+      radial-gradient(
+        circle at 18% -20%,
+        rgba(255, 239, 192, 0.14),
+        transparent 38%
+      ),
+      radial-gradient(
+        circle at 82% 120%,
+        rgba(11, 145, 180, 0.10),
+        transparent 38%
+      );
+
+    opacity: 0.55;
+  }
+
+  .lau-navbar-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.045) 48%,
+        transparent 100%
+      );
+
+    transform: translateX(-100%);
+    animation: navbar-shimmer 12s ease-in-out infinite;
+  }
+
+  @keyframes navbar-shimmer {
+    0%,
+    70% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* ========================================================
+     DESKTOP NAVIGATION LINKS
+  ======================================================== */
+
+  .lau-nav-link {
+    position: relative;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid transparent;
+    border-radius: 9999px;
+
+    padding: 0.75rem 1rem;
+
+    color: rgba(255, 249, 231, 0.92);
+
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+
+    transition:
+      color 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .lau-nav-link::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    bottom: 0.4rem;
+    left: 1rem;
+
+    height: 2px;
+    border-radius: 9999px;
+
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        #e1ad25,
+        transparent
+      );
+
+    transform: scaleX(0);
+    transform-origin: center;
+
+    transition: transform 0.25s ease;
+  }
+
+  .lau-nav-link:hover {
+    color: #C9961A;
+    border-color: rgba(225, 173, 37, 0.30);
+    background: rgba(255, 255, 255, 0.10);
+    transform: translateY(-1px);
+  }
+
+  .lau-nav-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  .lau-nav-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #e1ad25;
+  }
+
+  .lau-nav-link-active {
+    color: #C9961A;
+    border-color: rgba(225, 173, 37, 0.34);
+    background: rgba(255, 255, 255, 0.12);
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      0 4px 14px rgba(0, 0, 0, 0.16);
+  }
+
+  .lau-nav-link-active::after {
+    transform: scaleX(1);
+  }
+
+  /* ========================================================
+     DROPDOWN HEADER
+  ======================================================== */
+
+  .resource-dropdown-header {
+    position: relative;
+    overflow: hidden;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(3, 45, 71, 0.92),
+        rgba(6, 59, 92, 0.92)
+      ),
+      url("{% static 'images/masiborder.png' %}");
+
+    background-repeat:
+      no-repeat,
+      repeat-x;
+
+    background-position:
+      center,
+      center;
+
+    background-size:
+      cover,
+      auto 100%;
+
+    background-blend-mode:
+      normal,
+      soft-light;
+  }
+
+  /* ========================================================
+     AUDIO BUTTONS
+  ======================================================== */
+
+  .lau-audio-button {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    place-items: center;
+
+    border: 1px solid rgba(225, 173, 37, 0.65);
+    border-radius: 9999px;
+
+    background:
+      linear-gradient(
+        145deg,
+        rgba(225, 173, 37, 0.18),
+        rgba(255, 255, 255, 0.05)
+      );
+
+    color: #C9961A;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.10),
+      0 4px 12px rgba(0, 0, 0, 0.16);
+
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .lau-audio-button:hover {
+    color: #063b5c;
+    background: #C9961A;
+    transform: translateY(-1px);
+
+    box-shadow:
+      0 8px 18px rgba(0, 0, 0, 0.18),
+      0 0 0 4px rgba(225, 173, 37, 0.14);
+  }
+
+  .lau-audio-button:focus-visible {
+    outline: none;
+
+    box-shadow:
+      0 0 0 2px #063b5c,
+      0 0 0 4px #e1ad25;
+  }
+
+  /* ========================================================
+     MOBILE DRAWER
+  ======================================================== */
+
+  .mobile-drawer {
+    position: fixed;
+    isolation: isolate;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(3, 45, 71, 0.92),
+        rgba(6, 59, 92, 0.91) 55%,
+        rgba(2, 38, 59, 0.95)
+      );
+  }
+
+  .mobile-drawer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+
+    background-image:
+      url("{% static 'images/masiborder.png' %}");
+
+    background-repeat: repeat;
+    background-position: center;
+    background-size: auto 105px;
+
+    opacity: 0.34;
+    mix-blend-mode: soft-light;
+
+    filter: contrast(1.2);
+
+    pointer-events: none;
+  }
+
+  .mobile-drawer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background:
+      radial-gradient(
+        circle at top right,
+        rgba(225, 173, 37, 0.14),
+        transparent 34%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.025),
+        transparent 30%
+      );
+
+    pointer-events: none;
+  }
+
+  .mobile-masi-accent {
+    width: 100%;
+    height: 12px;
+
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(225, 173, 37, 0.20),
+        rgba(225, 173, 37, 0.90),
+        rgba(255, 241, 190, 0.96),
+        rgba(225, 173, 37, 0.90),
+        rgba(225, 173, 37, 0.20)
+      ),
+      url("{% static 'images/masiborder.png' %}");
+
+    background-repeat:
+      no-repeat,
+      repeat-x;
+
+    background-position:
+      center,
+      center;
+
+    background-size:
+      cover,
+      auto 34px;
+
+    background-blend-mode:
+      multiply;
+
+    border-top: 1px solid rgba(225, 173, 37, 0.30);
+    border-bottom: 1px solid rgba(225, 173, 37, 0.42);
+  }
+
+  .mobile-nav-link {
+    min-height: 48px;
+    border: 1px solid transparent;
+    border-radius: 0.65rem;
+    padding: 0.75rem 1rem;
+
+    color: rgba(255, 249, 231, 0.92);
+
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+
+    transition:
+      color 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .mobile-nav-link:hover {
+    color: #e1ad25;
+    border-color: rgba(225, 173, 37, 0.24);
+    background: rgba(255, 255, 255, 0.10);
+    transform: translateX(3px);
+  }
+
+  .mobile-nav-link-active {
+    color: #e1ad25;
+    border-color: rgba(225, 173, 37, 0.30);
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* ========================================================
+     MOBILE DRAWER ANIMATION
+  ======================================================== */
+
+  #mobileMenu .drawer-item {
+    opacity: 0;
+    transform: translateY(8px);
+
+    transition:
+      opacity 0.35s ease,
+      transform 0.35s ease;
+  }
+
+  #mobileMenu.menu-open .drawer-item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #navToggle.is-open .hamburger-bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  #navToggle.is-open .hamburger-bar:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  #navToggle.is-open .hamburger-bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* ========================================================
+     RESPONSIVE ADJUSTMENTS
+  ======================================================== */
+
+  @media (max-width: 1100px) {
+    .lau-nav-link {
+      padding-right: 0.75rem;
+      padding-left: 0.75rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .lau-navbar::before {
+      background-size: auto 90px;
+      opacity: 0.38;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lau-navbar-overlay::before {
+      animation: none !important;
+    }
+
+    #mobileMenu,
+    #mobileMenuBackdrop,
+    #mobileMenu .drawer-item,
+    .hamburger-bar,
+    .lau-nav-link,
+    .lau-audio-button,
+    .mobile-nav-link {
+      transition: none !important;
+    }
+  }
+
+

@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from .models import Koro, KoroReport
+from .models import Koro, KoroDroneVideo, KoroReport
+
+
+class KoroDroneVideoInline(admin.TabularInline):
+    model = KoroDroneVideo
+    extra = 1
+    fields = ("title", "video_file", "video_url", "thumbnail", "order")
 
 
 @admin.register(Koro)
@@ -11,6 +17,13 @@ class KoroAdmin(admin.ModelAdmin):
     ordering = ("tikina__number", "-is_koro_turaga", "name")
     list_editable = ("is_koro_turaga",)
     readonly_fields = ("slug",)
+    inlines = [KoroDroneVideoInline]
+
+
+@admin.register(KoroDroneVideo)
+class KoroDroneVideoAdmin(admin.ModelAdmin):
+    list_display = ("koro", "title", "order", "uploaded_at")
+    list_filter = ("koro",)
 
 
 @admin.register(KoroReport)

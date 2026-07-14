@@ -1,16 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}{{ koro.name }} | Na Koro{% endblock %}
+{% block title %}{{ koro.name }} | Yasana ko Lau{% endblock %}
 
 {% block content %}
-<section class="max-w-6xl mx-auto px-4 py-8">
-  <nav class="text-sm text-lau-muted">
-    <a class="font-semibold text-lau-earth" href="{% url 'home' %}">Home</a>
-    &rarr; <a class="font-semibold text-lau-earth" href="{% url 'koro:list' %}">Koro</a>
-    &rarr; {{ koro.name }}
-  </nav>
-</section>
-
 <section class="bg-lau-navy text-lau-cream">
   <div class="max-w-6xl mx-auto px-4 py-12">
     <span class="rounded bg-lau-gold px-3 py-1 text-sm font-semibold text-lau-navy">{{ tikina.name }}</span>
@@ -20,6 +13,62 @@
   </div>
 </section>
 {% include "partials/masi_divider.html" %}
+
+<!-- =========================================================
+     DRONE FOOTAGE
+========================================================== -->
+<section class="bg-lau-navy text-lau-cream">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <span class="rounded bg-lau-gold px-3 py-1 text-sm font-semibold text-lau-navy">
+      Drone Footage
+    </span>
+    <h2 class="mt-4 font-display text-3xl text-lau-gold">
+      {{ koro.name }} from Above
+    </h2>
+    <p class="mt-2 text-sm text-lau-cream/75">
+      Aerial views of {{ koro.name }}, {{ tikina.name }}
+    </p>
+    {% with videos=koro.drone_videos.all %}
+      {% if videos %}
+        {% with featured=videos.0 %}
+          {% if featured.video_file %}
+            <video class="aspect-video w-full" controls preload="metadata"{% if featured.thumbnail %} poster="{{ featured.thumbnail.url }}"{% endif %}>
+                  <source src="{{ featured.video_file.url }}" type="video/mp4">
+            </video>
+          {% elif featured.video_url %}
+            <iframe class="aspect-video w-full" src="{{ featured.video_url }}" title="{{ featured.title|default:koro.name }}" allowfullscreen></iframe>
+          {% endif %}
+          {% if featured.title %}
+            <h3 class="mt-3 font-display text-2xl text-lau-gold">{{ featured.title }}</h3>
+          {% endif %}
+        {% endwith %}
+        {% if videos|length > 1 %}
+          <div class="mt-6 grid gap-4 md:grid-cols-2">
+            {% for video in videos|slice:"1:" %}
+              <div>
+                {% if video.video_file %}
+                  <video class="aspect-video w-full" controls preload="metadata"{% if video.thumbnail %} poster="{{ video.thumbnail.url }}"{% endif %}>
+                        <source src="{{ video.video_file.url }}" type="video/mp4">
+                  </video>
+                {% elif video.video_url %}
+                  <iframe class="aspect-video w-full" src="{{ video.video_url }}" title="{{ video.title|default:koro.name }}" allowfullscreen></iframe>
+                {% endif %}
+                {% if video.title %}
+                  <h3 class="mt-3 font-display text-xl text-lau-gold">{{ video.title }}</h3>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="mt-6 text-sm text-lau-cream/75">No drone footage has been uploaded for {{ koro.name }} yet.</p>
+      {% endif %}
+    {% endwith %}
+   
+  </div>
+</section>
+{% include "partials/masi_divider.html" %}
+
 
 <section class="max-w-6xl mx-auto px-4 py-10 grid gap-6 lg:grid-cols-[1fr_320px]">
   <article class="rounded-md bg-lau-white p-6 shadow-sm">

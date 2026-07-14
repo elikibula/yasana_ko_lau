@@ -36,7 +36,7 @@ class KoroDetailView(DetailView):
     context_object_name = "koro"
 
     def get_queryset(self):
-        return Koro.objects.select_related("tikina", "turaga_ni_koro", "turaga_ni_koro__user")
+        return Koro.objects.select_related("tikina", "turaga_ni_koro", "turaga_ni_koro__user").prefetch_related("drone_videos")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
