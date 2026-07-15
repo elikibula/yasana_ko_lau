@@ -9,7 +9,7 @@
   <div class="absolute inset-0 bg-lau-navy/65"></div>
   <div class="relative max-w-6xl mx-auto px-4 py-14">
     <p class="text-sm font-semibold uppercase text-lau-gold">Na itukutuku ni Yasana ko Lau</p>
-    <h1 class="mt-3 font-display text-4xl md:text-5xl">Ko Lau News</h1>
+    <h1 class="mt-3 font-display text-4xl md:text-5xl">Talanoa kei na Tukutuku!</h1>
   </div>
 </section>
 {% include "partials/masi_divider.html" %}
@@ -18,16 +18,54 @@
   {% if featured_posts %}
     <div class="grid gap-4 md:grid-cols-3">
       {% for post in featured_posts %}
-        <article class="rounded-md bg-lau-white shadow-sm overflow-hidden">
-          <div class="relative">{% if post.card_image %}<img src="{{ post.card_image.url }}" alt="" loading="lazy" class="h-44 w-full object-cover">{% else %}<div class="h-44 bg-lau-navy"></div>{% endif %}{% if post.is_video_news %}<span class="absolute inset-0 flex items-center justify-center text-5xl text-white drop-shadow">&#9654;</span>{% endif %}</div>
-          <div class="p-5">
-            {% include "news/partials/type_badge.html" %}
-            {% if post.category %}<span class="rounded bg-lau-gold px-2 py-1 text-xs font-semibold text-lau-navy">{{ post.category.name }}</span>{% endif %}
-            <h2 class="mt-3 font-display text-2xl text-lau-navy">{{ post.title }}</h2>
-            <p class="mt-2 text-sm text-gray-700">{{ post.summary|truncatechars:140 }}</p>
-            <a href="{% url 'news:detail' post.slug %}" class="mt-4 inline-flex font-semibold text-lau-earth">Read More &rarr;</a>
-          </div>
-        </article>
+        <a
+          href="{% url 'news:detail' post.slug %}"
+          class="group block rounded-md focus:outline-none focus:ring-2 focus:ring-lau-gold focus:ring-offset-2"
+          aria-label="Read {{ post.title }}"
+        >
+          <article class="h-full overflow-hidden rounded-md bg-lau-white shadow-sm transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:scale-[1.02] group-hover:shadow-xl">
+            <div class="relative overflow-hidden">
+              {% if post.card_image %}
+                <img
+                  src="{{ post.card_image.url }}"
+                  alt="{{ post.title }}"
+                  loading="lazy"
+                  class="h-44 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                >
+              {% else %}
+                <div class="h-44 bg-lau-navy"></div>
+              {% endif %}
+
+              {% if post.is_video_news %}
+                <span class="absolute inset-0 flex items-center justify-center text-5xl text-white drop-shadow transition-transform duration-300 group-hover:scale-110">
+                  &#9654;
+                </span>
+              {% endif %}
+            </div>
+
+            <div class="p-5">
+              {% include "news/partials/type_badge.html" %}
+
+              {% if post.category %}
+                <span class="rounded bg-lau-gold px-2 py-1 text-xs font-semibold text-lau-navy">
+                  {{ post.category.name }}
+                </span>
+              {% endif %}
+
+              <h2 class="mt-3 font-display text-2xl text-lau-navy transition-colors duration-300 group-hover:text-lau-earth">
+                {{ post.title }}
+              </h2>
+
+              <p class="mt-2 text-sm text-gray-700">
+                {{ post.summary|truncatechars:140 }}
+              </p>
+
+              <span class="mt-4 inline-flex font-semibold text-lau-earth transition-all duration-300 group-hover:translate-x-1">
+                Read More &rarr;
+              </span>
+            </div>
+          </article>
+        </a>
       {% endfor %}
     </div>
   {% endif %}
@@ -35,40 +73,96 @@
   <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_280px]">
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {% for post in posts %}
-        <article class="rounded-md bg-lau-white shadow-sm overflow-hidden">
-          <div class="relative">{% if post.card_image %}<img src="{{ post.card_image.url }}" alt="" loading="lazy" class="h-40 w-full object-cover">{% else %}<div class="h-40 bg-gradient-to-br from-lau-navy to-lau-ocean"></div>{% endif %}{% if post.is_video_news %}<span class="absolute inset-0 flex items-center justify-center text-5xl text-white drop-shadow">&#9654;</span>{% endif %}</div>
-          <div class="p-5">
-            {% include "news/partials/type_badge.html" %}
-            <div class="flex flex-wrap items-center gap-2 text-xs">
-              {% if post.category %}<span class="rounded bg-lau-gold px-2 py-1 font-semibold text-lau-navy">{{ post.category.name }}</span>{% endif %}
-              <span class="text-lau-muted">{{ post.published_at|date:"d F Y" }}</span>
+        <a
+          href="{% url 'news:detail' post.slug %}"
+          class="group block rounded-md focus:outline-none focus:ring-2 focus:ring-lau-gold focus:ring-offset-2"
+          aria-label="Read {{ post.title }}"
+        >
+          <article class="h-full overflow-hidden rounded-md bg-lau-white shadow-sm transition-all duration-300 ease-out group-hover:-translate-y-1 group-hover:scale-[1.02] group-hover:shadow-xl">
+            <div class="relative overflow-hidden">
+              {% if post.card_image %}
+                <img
+                  src="{{ post.card_image.url }}"
+                  alt="{{ post.title }}"
+                  loading="lazy"
+                  class="h-40 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                >
+              {% else %}
+                <div class="h-40 bg-gradient-to-br from-lau-navy to-lau-ocean"></div>
+              {% endif %}
+
+              {% if post.is_video_news %}
+                <span class="absolute inset-0 flex items-center justify-center text-5xl text-white drop-shadow transition-transform duration-300 group-hover:scale-110">
+                  &#9654;
+                </span>
+              {% endif %}
             </div>
-            <h2 class="mt-3 font-display text-xl text-lau-navy">{{ post.title }}</h2>
-            <p class="mt-2 text-sm text-gray-700">{{ post.summary|truncatechars:120 }}</p>
-            <a href="{% url 'news:detail' post.slug %}" class="mt-4 inline-flex font-semibold text-lau-earth">Read More &rarr;</a>
-          </div>
-        </article>
+
+            <div class="p-5">
+              {% include "news/partials/type_badge.html" %}
+
+              <div class="flex flex-wrap items-center gap-2 text-xs">
+                {% if post.category %}
+                  <span class="rounded bg-lau-gold px-2 py-1 font-semibold text-lau-navy">
+                    {{ post.category.name }}
+                  </span>
+                {% endif %}
+
+                <span class="text-lau-muted">
+                  {{ post.published_at|date:"d F Y" }}
+                </span>
+              </div>
+
+              <h2 class="mt-3 font-display text-xl text-lau-navy transition-colors duration-300 group-hover:text-lau-earth">
+                {{ post.title }}
+              </h2>
+
+              <p class="mt-2 text-sm text-gray-700">
+                {{ post.summary|truncatechars:120 }}
+              </p>
+
+              <span class="mt-4 inline-flex font-semibold text-lau-earth transition-all duration-300 group-hover:translate-x-1">
+                Read More &rarr;
+              </span>
+            </div>
+          </article>
+        </a>
       {% empty %}
-        <p class="rounded-md bg-lau-white p-5 text-gray-700">No published news yet.</p>
+        <p class="rounded-md bg-lau-white p-5 text-gray-700">
+          No published news yet.
+        </p>
       {% endfor %}
     </div>
 
-    <aside class="hidden lg:block space-y-5">
+    <aside class="hidden space-y-5 lg:block">
       <section class="rounded-md bg-lau-white p-5 shadow-sm">
         <h2 class="font-display text-xl text-lau-navy">Categories</h2>
+
         <div class="mt-3 grid gap-2 text-sm">
           {% for category in categories %}
-            <a class="text-lau-earth hover:text-lau-navy" href="{% url 'news:category' category.slug %}">{{ category.name }}</a>
+            <a
+              class="text-lau-earth hover:text-lau-navy"
+              href="{% url 'news:category' category.slug %}"
+            >
+              {{ category.name }}
+            </a>
           {% empty %}
             <span class="text-lau-muted">No categories yet.</span>
           {% endfor %}
         </div>
       </section>
+
       <section class="rounded-md bg-lau-white p-5 shadow-sm">
         <h2 class="font-display text-xl text-lau-navy">Recent Posts</h2>
+
         <div class="mt-3 grid gap-3 text-sm">
           {% for post in recent_posts %}
-            <a class="font-semibold text-lau-navy hover:text-lau-earth" href="{% url 'news:detail' post.slug %}">{{ post.title }}</a>
+            <a
+              class="font-semibold text-lau-navy hover:text-lau-earth"
+              href="{% url 'news:detail' post.slug %}"
+            >
+              {{ post.title }}
+            </a>
           {% endfor %}
         </div>
       </section>
@@ -77,9 +171,27 @@
 
   {% if is_paginated %}
     <nav class="mt-8 flex items-center justify-center gap-2">
-      {% if page_obj.has_previous %}<a class="rounded bg-lau-gold px-3 py-2 font-semibold text-lau-navy" href="?page={{ page_obj.previous_page_number }}">Prev</a>{% endif %}
-      <span class="rounded bg-lau-white px-3 py-2 text-sm text-lau-navy">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-      {% if page_obj.has_next %}<a class="rounded bg-lau-gold px-3 py-2 font-semibold text-lau-navy" href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+      {% if page_obj.has_previous %}
+        <a
+          class="rounded bg-lau-gold px-3 py-2 font-semibold text-lau-navy"
+          href="?page={{ page_obj.previous_page_number }}"
+        >
+          Prev
+        </a>
+      {% endif %}
+
+      <span class="rounded bg-lau-white px-3 py-2 text-sm text-lau-navy">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+        <a
+          class="rounded bg-lau-gold px-3 py-2 font-semibold text-lau-navy"
+          href="?page={{ page_obj.next_page_number }}"
+        >
+          Next
+        </a>
+      {% endif %}
     </nav>
   {% endif %}
 </section>

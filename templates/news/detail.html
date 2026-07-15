@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ post.title }} | Ko Lau News{% endblock %}
+{% block title %}{{ post.title }} | News ni Yasana ko Lau{% endblock %}
 
 {% block content %}
 <article>
@@ -16,7 +16,7 @@
   </section>
   {% include "partials/masi_divider.html" %}
   <div class="max-w-3xl mx-auto px-4 py-10">
-    <a href="{% url 'news:list' %}" class="font-semibold text-lau-earth">&larr; Ko Lau News</a>
+    <a href="{% url 'news:list' %}" class="font-semibold text-lau-earth">&larr; Yasana ko Lau News</a>
     {% if post.summary %}<p class="mt-6 text-lg leading-8 text-lau-muted">{{ post.summary }}</p>{% endif %}
     {% if post.is_video_news %}
       <div class="mt-6 overflow-hidden rounded-xl bg-black shadow-lg">
