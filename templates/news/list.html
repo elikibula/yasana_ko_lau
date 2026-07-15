@@ -19,8 +19,9 @@
     <div class="grid gap-4 md:grid-cols-3">
       {% for post in featured_posts %}
         <article class="rounded-md bg-lau-white shadow-sm overflow-hidden">
-          {% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="" class="h-44 w-full object-cover">{% else %}<div class="h-44 bg-lau-navy"></div>{% endif %}
+          <div class="relative">{% if post.card_image %}<img src="{{ post.card_image.url }}" alt="" loading="lazy" class="h-44 w-full object-cover">{% else %}<div class="h-44 bg-lau-navy"></div>{% endif %}{% if post.is_video_news %}<span class="absolute inset-0 flex items-center justify-center text-5xl text-white drop-shadow">&#9654;</span>{% endif %}</div>
           <div class="p-5">
+            {% include "news/partials/type_badge.html" %}
             {% if post.category %}<span class="rounded bg-lau-gold px-2 py-1 text-xs font-semibold text-lau-navy">{{ post.category.name }}</span>{% endif %}
             <h2 class="mt-3 font-display text-2xl text-lau-navy">{{ post.title }}</h2>
             <p class="mt-2 text-sm text-gray-700">{{ post.summary|truncatechars:140 }}</p>
@@ -35,8 +36,9 @@
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {% for post in posts %}
         <article class="rounded-md bg-lau-white shadow-sm overflow-hidden">
-          {% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="" class="h-40 w-full object-cover">{% else %}<div class="h-40 bg-gradient-to-br from-lau-navy to-lau-ocean"></div>{% endif %}
+          <div class="relative">{% if post.card_image %}<img src="{{ post.card_image.url }}" alt="" loading="lazy" class="h-40 w-full object-cover">{% else %}<div class="h-40 bg-gradient-to-br from-lau-navy to-lau-ocean"></div>{% endif %}{% if post.is_video_news %}<span class="absolute inset-0 flex items-center justify-center text-5xl text-white drop-shadow">&#9654;</span>{% endif %}</div>
           <div class="p-5">
+            {% include "news/partials/type_badge.html" %}
             <div class="flex flex-wrap items-center gap-2 text-xs">
               {% if post.category %}<span class="rounded bg-lau-gold px-2 py-1 font-semibold text-lau-navy">{{ post.category.name }}</span>{% endif %}
               <span class="text-lau-muted">{{ post.published_at|date:"d F Y" }}</span>

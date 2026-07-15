@@ -9,6 +9,7 @@
     <div class="absolute inset-0 bg-lau-navy/60"></div>
     <div class="relative max-w-4xl mx-auto px-4 py-20">
       {% if post.category %}<span class="rounded bg-lau-gold px-3 py-1 text-sm font-semibold text-lau-navy">{{ post.category.name }}</span>{% endif %}
+      <span class="ml-2">{% include "news/partials/type_badge.html" %}</span>
       <h1 class="mt-5 font-display text-4xl md:text-5xl">{{ post.title }}</h1>
       <p class="mt-4 text-lau-cream">By {{ post.author.get_full_name|default:post.author.username|default:"Roko Office" }} · {{ post.published_at|date:"d F Y" }}</p>
     </div>
@@ -16,7 +17,19 @@
   {% include "partials/masi_divider.html" %}
   <div class="max-w-3xl mx-auto px-4 py-10">
     <a href="{% url 'news:list' %}" class="font-semibold text-lau-earth">&larr; Ko Lau News</a>
-    <div class="mt-6 space-y-5 leading-8 text-gray-800">{{ post.body|linebreaks }}</div>
+    {% if post.summary %}<p class="mt-6 text-lg leading-8 text-lau-muted">{{ post.summary }}</p>{% endif %}
+    {% if post.is_video_news %}
+      <div class="mt-6 overflow-hidden rounded-xl bg-black shadow-lg">
+        {% if post.video_file %}<video controls playsinline preload="metadata" poster="{% if post.video_thumbnail %}{{ post.video_thumbnail.url }}{% endif %}" class="aspect-video w-full"><source src="{{ post.video_file.url }}">Your browser does not support the video element.</video>
+        {% elif post.youtube_embed_url %}<div class="aspect-video"><iframe src="{{ post.youtube_embed_url }}" title="{{ post.title }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen class="h-full w-full"></iframe></div>
+        {% elif post.video_url %}<div class="p-6 text-center text-white"><a href="{{ post.video_url }}" rel="noopener noreferrer" target="_blank" class="font-semibold text-lau-gold">Watch video on the provider's website</a></div>{% endif %}
+      </div>
+    {% elif post.is_photo_news %}
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        {% for photo in post.photos.all %}<figure><button type="button" class="gallery-open block w-full" data-src="{{ photo.image.url }}" data-caption="{{ photo.caption }}"><img src="{{ photo.image.url }}" alt="{{ photo.caption|default:post.title }}" loading="lazy" class="h-64 w-full rounded-lg object-cover shadow-sm"></button>{% if photo.caption %}<figcaption class="mt-2 text-sm text-lau-muted">{{ photo.caption }}</figcaption>{% endif %}</figure>{% endfor %}
+      </div>
+    {% endif %}
+    {% if post.body %}<div class="mt-6 space-y-5 leading-8 text-gray-800">{{ post.body|linebreaks }}</div>{% endif %}
   </div>
 </article>
 
@@ -33,4 +46,8 @@
     {% endfor %}
   </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if post.is_photo_news %}<dialog id="gallery-modal" class="m-auto max-h-[92vh] max-w-[92vw] rounded-xl bg-lau-navy p-3 text-white backdrop:bg-black/80"><button type="button" class="float-right px-3 py-1 text-2xl" aria-label="Close">&times;</button><img class="max-h-[80vh] max-w-full object-contain" alt=""><p class="p-2 text-center"></p></dialog><script>(()=>{const modal=document.getElementById('gallery-modal'),img=modal.querySelector('img'),caption=modal.querySelector('p');document.querySelectorAll('.gallery-open').forEach(button=>button.addEventListener('click',()=>{img.src=button.dataset.src;img.alt=button.dataset.caption||'News gallery photo';caption.textContent=button.dataset.caption;modal.showModal()}));modal.querySelector('button').addEventListener('click',()=>modal.close());modal.addEventListener('click',event=>{if(event.target===modal)modal.close()})})();</script>{% endif %}
 {% endblock %}

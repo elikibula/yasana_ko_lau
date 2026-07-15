@@ -10,7 +10,7 @@
         {% for post in latest_news %}
           <a class="rounded border border-lau-cream p-3 hover:bg-lau-cream" href="{% url 'news:detail' post.slug %}">
             <strong class="block text-lau-navy">{{ post.title }}</strong>
-            <span class="text-xs text-lau-muted">{{ post.published_at|date:"d M Y" }}</span>
+            <span class="text-xs text-lau-muted">{{ post.get_news_type_display }} &middot; {{ post.published_at|date:"d M Y" }}</span>
           </a>
         {% empty %}
           <p class="text-sm text-gray-700">No published news yet.</p>

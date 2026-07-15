@@ -20,7 +20,7 @@ class HomeView(TemplateView):
         context["homepage_news"] = NewsPost.objects.filter(
             status="published",
             published_at__isnull=False,
-        ).select_related("category")[:3]
+        ).select_related("category").prefetch_related("photos")[:3]
         context["homepage_events"] = Event.objects.filter(
             status__in=["upcoming", "ongoing"],
             start_date__gte=timezone.now(),

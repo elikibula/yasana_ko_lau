@@ -1,10 +1,12 @@
 from django.contrib import messages
+from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from accounts.mixins import RoleRequiredMixin
 
-from .forms import NewsPostForm
+from .forms import NewsPhotoFormSet, NewsPostForm
 from .models import NewsCategory, NewsPost
 
 
@@ -13,6 +15,7 @@ class PublishedNewsMixin:
         return (
             NewsPost.objects.filter(status="published", published_at__isnull=False)
             .select_related("category", "author")
+            .prefetch_related("photos")
             .order_by("-published_at", "-created_at")
         )
 
@@ -91,10 +94,33 @@ class NewsCreateView(RoleRequiredMixin, CreateView):
     template_name = "news/manage/form.html"
     success_url = reverse_lazy("news:manage")
 
-    def form_valid(self, form):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["photo_formset"] = kwargs.get("photo_formset") or NewsPhotoFormSet(self.request.POST or None, self.request.FILES or None)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = self.get_form()
+        formset = NewsPhotoFormSet(request.POST, request.FILES)
+        if form.is_valid() and formset.is_valid():
+            if form.cleaned_data["news_type"] == NewsPost.NEWS_TYPE_PHOTO and not any(
+                item.cleaned_data and not item.cleaned_data.get("DELETE") and (item.cleaned_data.get("image") or item.instance.image)
+                for item in formset.forms
+            ):
+                formset._non_form_errors = formset.error_class(["Photo News requires at least one gallery photo."])
+            else:
+                return self.forms_valid(form, formset)
+        return self.render_to_response(self.get_context_data(form=form, photo_formset=formset))
+
+    def forms_valid(self, form, formset):
         form.instance.author = self.request.user
+        with transaction.atomic():
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
         messages.success(self.request, "News post saved.")
-        return super().form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class NewsUpdateView(RoleRequiredMixin, UpdateView):
@@ -103,6 +129,31 @@ class NewsUpdateView(RoleRequiredMixin, UpdateView):
     form_class = NewsPostForm
     template_name = "news/manage/form.html"
     success_url = reverse_lazy("news:manage")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["photo_formset"] = kwargs.get("photo_formset") or NewsPhotoFormSet(
+            self.request.POST or None, self.request.FILES or None, instance=self.object
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        formset = NewsPhotoFormSet(request.POST, request.FILES, instance=self.object)
+        if form.is_valid() and formset.is_valid():
+            if form.cleaned_data["news_type"] == NewsPost.NEWS_TYPE_PHOTO and not any(
+                item.cleaned_data and not item.cleaned_data.get("DELETE") and (item.cleaned_data.get("image") or item.instance.image)
+                for item in formset.forms
+            ):
+                formset._non_form_errors = formset.error_class(["Photo News requires at least one gallery photo."])
+            else:
+                with transaction.atomic():
+                    self.object = form.save()
+                    formset.save()
+                messages.success(request, "News post updated.")
+                return HttpResponseRedirect(self.get_success_url())
+        return self.render_to_response(self.get_context_data(form=form, photo_formset=formset))
 
     def form_valid(self, form):
         messages.success(self.request, "News post updated.")

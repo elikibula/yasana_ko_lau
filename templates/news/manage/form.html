@@ -7,18 +7,56 @@
   <h1 class="font-display text-3xl text-lau-navy">{% if object %}Edit News Post{% else %}Create News Post{% endif %}</h1>
   <form method="post" enctype="multipart/form-data" class="mt-6 space-y-5 rounded-md bg-lau-white p-6 shadow-sm">
     {% csrf_token %}
+    {% if form.non_field_errors %}<div class="rounded-md bg-red-50 p-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
     {% for field in form %}
-      <div>
+      <div data-field="{{ field.name }}">
         <label class="block text-sm font-semibold text-lau-navy">{{ field.label }}</label>
         <div class="mt-2">{{ field }}</div>
         {% if field.help_text %}<p class="mt-1 text-xs text-lau-muted">{{ field.help_text }}</p>{% endif %}
         {% for error in field.errors %}<p class="mt-1 text-sm text-red-700">{{ error }}</p>{% endfor %}
       </div>
     {% endfor %}
+    <fieldset data-photo-fields class="rounded-md border border-lau-cream p-4">
+      <legend class="px-2 font-display text-xl text-lau-navy">Photo Gallery</legend>
+      {{ photo_formset.management_form }}
+      {% if photo_formset.non_form_errors %}<div class="mb-3 text-sm text-red-700">{{ photo_formset.non_form_errors }}</div>{% endif %}
+      <div id="photo-forms" class="space-y-4">
+        {% for photo_form in photo_formset %}
+          <div class="photo-form grid gap-3 rounded-md bg-lau-cream/50 p-4 md:grid-cols-3">
+            {{ photo_form.id }}
+            {% for hidden in photo_form.hidden_fields %}{% if hidden.name != 'id' %}{{ hidden }}{% endif %}{% endfor %}
+            <div><label class="text-sm font-semibold text-lau-navy">Image</label>{{ photo_form.image }}{{ photo_form.image.errors }}</div>
+            <div><label class="text-sm font-semibold text-lau-navy">Caption</label>{{ photo_form.caption }}{{ photo_form.caption.errors }}</div>
+            <div><label class="text-sm font-semibold text-lau-navy">Display order</label>{{ photo_form.display_order }}{{ photo_form.display_order.errors }}{% if photo_form.instance.pk %}<label class="mt-3 flex gap-2 text-sm text-red-700">{{ photo_form.DELETE }} Delete</label>{% endif %}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <button id="add-photo" type="button" class="mt-4 rounded-md border border-lau-gold px-4 py-2 font-semibold text-lau-earth">Add another photo</button>
+      <template id="empty-photo-form"><div class="photo-form grid gap-3 rounded-md bg-lau-cream/50 p-4 md:grid-cols-3"><div><label class="text-sm font-semibold text-lau-navy">Image</label>{{ photo_formset.empty_form.image }}</div><div><label class="text-sm font-semibold text-lau-navy">Caption</label>{{ photo_formset.empty_form.caption }}</div><div><label class="text-sm font-semibold text-lau-navy">Display order</label>{{ photo_formset.empty_form.display_order }}</div></div></template>
+    </fieldset>
     <div class="flex gap-3">
       <button class="rounded-md bg-lau-gold px-5 py-3 font-semibold text-lau-navy" type="submit">Save Post</button>
       <a class="rounded-md border border-lau-gold px-5 py-3 font-semibold text-lau-earth" href="{% url 'news:manage' %}">Cancel</a>
     </div>
   </form>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(() => {
+  const type = document.querySelector('[data-news-type]');
+  const groups = {article: ['body'], photo: ['body', 'cover_image'], video: ['body', 'cover_image', 'video_file', 'video_url', 'video_thumbnail']};
+  function updateFields() {
+    ['video_file','video_url','video_thumbnail'].forEach(name => { const el=document.querySelector(`[data-field="${name}"]`); if(el) el.hidden=type.value!=='video'; });
+    const gallery=document.querySelector('[data-photo-fields]'); if(gallery) gallery.hidden=type.value!=='photo';
+  }
+  type?.addEventListener('change', updateFields); updateFields();
+  document.getElementById('add-photo')?.addEventListener('click', () => {
+    const total=document.getElementById('id_photos-TOTAL_FORMS');
+    const html=document.getElementById('empty-photo-form').innerHTML.replaceAll('__prefix__', total.value);
+    document.getElementById('photo-forms').insertAdjacentHTML('beforeend', html); total.value=Number(total.value)+1;
+  });
+})();
+</script>
 {% endblock %}

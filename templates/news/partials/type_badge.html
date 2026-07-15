@@ -1,0 +1,4 @@
+<span class="rounded-full bg-lau-navy px-2.5 py-1 text-xs font-semibold text-lau-gold">
+  {% if post.is_photo_news %}&#128247; Photo Gallery{% elif post.is_video_news %}&#9654; Video{% else %}Article{% endif %}
+  {% if post.is_photo_news %} ({{ post.photos.all|length }}){% endif %}
+</span>
