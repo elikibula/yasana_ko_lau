@@ -1,13 +1,29 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ post.title }} | News ni Yasana ko Lau{% endblock %}
+{% block meta_description %}{{ post.summary|striptags|truncatechars:180 }}{% endblock %}
+{% block social_meta %}
+  <link rel="canonical" href="{{ post_share_url }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:description" content="{{ post.summary|striptags|truncatechars:180 }}">
+  <meta property="og:url" content="{{ post_share_url }}">
+  <meta property="og:site_name" content="Yasana ko Lau">
+  <meta property="og:image" content="{{ post_share_image_url }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ post.title }}">
+  <meta name="twitter:description" content="{{ post.summary|striptags|truncatechars:180 }}">
+  <meta name="twitter:image" content="{{ post_share_image_url }}">
+{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'news/css/news-gallery.css' %}">{% endblock %}
 
 {% block content %}
 <article>
   <section class="relative min-h-[360px] overflow-hidden bg-lau-navy text-lau-white">
     {% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-60">{% endif %}
     <div class="absolute inset-0 bg-lau-navy/60"></div>
-    <div class="relative max-w-4xl mx-auto px-4 py-20">
+    <div class="relative mx-auto max-w-4xl px-4 py-20">
       {% if post.category %}<span class="rounded bg-lau-gold px-3 py-1 text-sm font-semibold text-lau-navy">{{ post.category.name }}</span>{% endif %}
       <span class="ml-2">{% include "news/partials/type_badge.html" %}</span>
       <h1 class="mt-5 font-display text-4xl md:text-5xl">{{ post.title }}</h1>
@@ -15,7 +31,7 @@
     </div>
   </section>
   {% include "partials/masi_divider.html" %}
-  <div class="max-w-3xl mx-auto px-4 py-10">
+  <div class="mx-auto max-w-3xl px-4 py-10">
     <a href="{% url 'news:list' %}" class="font-semibold text-lau-earth">&larr; Yasana ko Lau News</a>
     {% if post.summary %}<p class="mt-6 text-lg leading-8 text-lau-muted">{{ post.summary }}</p>{% endif %}
     {% if post.is_video_news %}
@@ -25,29 +41,59 @@
         {% elif post.video_url %}<div class="p-6 text-center text-white"><a href="{{ post.video_url }}" rel="noopener noreferrer" target="_blank" class="font-semibold text-lau-gold">Watch video on the provider's website</a></div>{% endif %}
       </div>
     {% elif post.is_photo_news %}
-      <div class="mt-6 grid gap-4 sm:grid-cols-2">
-        {% for photo in post.photos.all %}<figure><button type="button" class="gallery-open block w-full" data-src="{{ photo.image.url }}" data-caption="{{ photo.caption }}"><img src="{{ photo.image.url }}" alt="{{ photo.caption|default:post.title }}" loading="lazy" class="h-64 w-full rounded-lg object-cover shadow-sm"></button>{% if photo.caption %}<figcaption class="mt-2 text-sm text-lau-muted">{{ photo.caption }}</figcaption>{% endif %}</figure>{% endfor %}
+      <div class="news-gallery mt-6 grid gap-4 sm:grid-cols-2" data-news-gallery>
+        {% for photo in post.photos.all %}
+          <figure>
+            <a href="{{ photo.image.url }}" class="news-gallery__item block overflow-hidden rounded-lg shadow-sm" data-gallery-index="{{ forloop.counter0 }}" data-caption="{{ photo.caption }}" aria-label="Enlarge photo {{ forloop.counter }} of {{ forloop.revcounter0|add:forloop.counter }}">
+              <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:post.title }}" loading="lazy" class="h-64 w-full object-cover">
+            </a>
+            {% if photo.caption %}<figcaption class="mt-2 text-sm text-lau-muted">{{ photo.caption }}</figcaption>{% endif %}
+          </figure>
+        {% endfor %}
       </div>
     {% endif %}
     {% if post.body %}<div class="mt-6 space-y-5 leading-8 text-gray-800">{{ post.body|linebreaks }}</div>{% endif %}
+
+    <section class="news-share mt-10 border-t border-lau-navy/10 pt-6" data-news-share data-share-url="{{ post_share_url }}" data-share-title="{{ post_share_title }}">
+      <div>
+        <p class="font-display text-xl text-lau-navy">Share this story</p>
+        <p class="text-sm text-lau-muted">Help others discover news from Yasana ko Lau.</p>
+      </div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button type="button" class="news-share__button" data-native-share hidden><i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>Share</span></button>
+        <a class="news-share__button" href="https://www.facebook.com/sharer/sharer.php?u={{ post_share_url|urlencode }}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-facebook" aria-hidden="true"></i>Facebook</a>
+        <a class="news-share__button" href="https://twitter.com/intent/tweet?url={{ post_share_url|urlencode }}&amp;text={{ post_share_title|urlencode }}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i>Share on X</a>
+        <a class="news-share__button" href="https://wa.me/?text={{ post_share_title|urlencode }}%20{{ post_share_url|urlencode }}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i>WhatsApp</a>
+        <a class="news-share__button" href="mailto:?subject={{ post_share_title|urlencode }}&amp;body={{ post_share_url|urlencode }}"><i class="fa-solid fa-envelope" aria-hidden="true"></i>Email</a>
+        <button type="button" class="news-share__button" data-copy-link><i class="fa-solid fa-link" aria-hidden="true"></i><span>Copy link</span></button>
+        <button type="button" class="news-share__button" data-instagram-share><i class="fa-brands fa-instagram" aria-hidden="true"></i><span>Instagram</span></button>
+      </div>
+      <p class="mt-3 min-h-5 text-sm font-semibold text-lau-ocean" data-share-feedback aria-live="polite"></p>
+    </section>
   </div>
 </article>
 
-<section class="max-w-6xl mx-auto px-4 py-8">
+{% if post.is_photo_news and post.photos.all %}
+<dialog class="news-lightbox" data-news-lightbox role="dialog" aria-modal="true" aria-label="News photo gallery">
+  <div class="news-lightbox__panel" data-gallery-backdrop>
+    <button type="button" class="news-lightbox__close" data-gallery-close aria-label="Close gallery">&times;</button>
+    <button type="button" class="news-lightbox__nav news-lightbox__nav--previous" data-gallery-previous aria-label="Previous photo">&#10094;</button>
+    <div class="news-lightbox__content">
+      <img class="news-lightbox__image" data-gallery-image alt="">
+      <p class="news-lightbox__caption" data-gallery-caption></p>
+      <p class="news-lightbox__counter" data-gallery-counter></p>
+    </div>
+    <button type="button" class="news-lightbox__nav news-lightbox__nav--next" data-gallery-next aria-label="Next photo">&#10095;</button>
+  </div>
+</dialog>
+{% endif %}
+
+<section class="mx-auto max-w-6xl px-4 py-8">
   <h2 class="font-display text-3xl text-lau-navy">Related News</h2>
   <div class="mt-5 grid gap-4 md:grid-cols-3">
-    {% for related in related_posts %}
-      <a href="{% url 'news:detail' related.slug %}" class="rounded-md bg-lau-white p-5 shadow-sm">
-        <span class="text-sm text-lau-muted">{{ related.published_at|date:"d M Y" }}</span>
-        <strong class="mt-2 block text-lau-navy">{{ related.title }}</strong>
-      </a>
-    {% empty %}
-      <p class="text-gray-700">No related news yet.</p>
-    {% endfor %}
+    {% for related in related_posts %}<a href="{% url 'news:detail' related.slug %}" class="rounded-md bg-lau-white p-5 shadow-sm"><span class="text-sm text-lau-muted">{{ related.published_at|date:"d M Y" }}</span><strong class="mt-2 block text-lau-navy">{{ related.title }}</strong></a>{% empty %}<p class="text-gray-700">No related news yet.</p>{% endfor %}
   </div>
 </section>
 {% endblock %}
 
-{% block extra_scripts %}
-{% if post.is_photo_news %}<dialog id="gallery-modal" class="m-auto max-h-[92vh] max-w-[92vw] rounded-xl bg-lau-navy p-3 text-white backdrop:bg-black/80"><button type="button" class="float-right px-3 py-1 text-2xl" aria-label="Close">&times;</button><img class="max-h-[80vh] max-w-full object-contain" alt=""><p class="p-2 text-center"></p></dialog><script>(()=>{const modal=document.getElementById('gallery-modal'),img=modal.querySelector('img'),caption=modal.querySelector('p');document.querySelectorAll('.gallery-open').forEach(button=>button.addEventListener('click',()=>{img.src=button.dataset.src;img.alt=button.dataset.caption||'News gallery photo';caption.textContent=button.dataset.caption;modal.showModal()}));modal.querySelector('button').addEventListener('click',()=>modal.close());modal.addEventListener('click',event=>{if(event.target===modal)modal.close()})})();</script>{% endif %}
-{% endblock %}
+{% block extra_scripts %}<script src="{% static 'news/js/news-gallery.js' %}" defer></script>{% endblock %}

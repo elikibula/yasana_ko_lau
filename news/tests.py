@@ -105,3 +105,67 @@ class NewsTypeTests(TestCase):
         self.assertEqual(post.photos.first().caption, "Earlier")
         later.delete()
         self.assertEqual(post.photos.count(), 1)
+
+
+class PublishedNewsDetailTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user("publisher")
+
+    def post(self, **overrides):
+        values = {
+            "title": "Published story",
+            "summary": "News from Lau",
+            "body": "Story body",
+            "status": "published",
+            "published_at": timezone.now(),
+            "author": self.user,
+        }
+        values.update(overrides)
+        return NewsPost.objects.create(**values)
+
+    def test_published_detail_has_absolute_share_url_and_draft_is_hidden(self):
+        published = self.post()
+        response = self.client.get(reverse("news:detail", args=[published.slug]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["post_share_url"], f"http://testserver{published.get_absolute_url()}")
+        self.assertContains(response, 'rel="canonical"')
+        draft = self.post(title="Draft", status="draft", published_at=None)
+        self.assertEqual(self.client.get(reverse("news:detail", args=[draft.slug])).status_code, 404)
+
+    def test_social_image_prefers_cover_then_first_photo_then_default(self):
+        covered = self.post(title="Covered", cover_image=image_upload("cover.jpg"))
+        response = self.client.get(covered.get_absolute_url())
+        self.assertIn(covered.cover_image.url, response.context["post_share_image_url"])
+
+        gallery = self.post(title="Gallery fallback", news_type="photo", body="")
+        first = NewsPhoto.objects.create(news=gallery, image=image_upload("first-social.jpg"), display_order=1)
+        response = self.client.get(gallery.get_absolute_url())
+        self.assertIn(first.image.url, response.context["post_share_image_url"])
+
+        plain = self.post(title="Default fallback")
+        response = self.client.get(plain.get_absolute_url())
+        self.assertEqual(response.context["post_share_image_url"], "http://testserver/static/images/logo_lau.png")
+
+    def test_gallery_is_ordered_scoped_and_progressively_enhanced(self):
+        post = self.post(title="Main gallery", news_type="photo", body="")
+        other = self.post(title="Other gallery", news_type="photo", body="")
+        later = NewsPhoto.objects.create(news=post, image=image_upload("later-detail.jpg"), caption='Later "quote"', display_order=8)
+        earlier = NewsPhoto.objects.create(news=post, image=image_upload("earlier-detail.jpg"), caption="Earlier", display_order=2)
+        unrelated = NewsPhoto.objects.create(news=other, image=image_upload("unrelated.jpg"), caption="Unrelated", display_order=1)
+
+        response = self.client.get(post.get_absolute_url())
+        content = response.content.decode()
+        self.assertLess(content.index(earlier.image.url), content.index(later.image.url))
+        self.assertNotIn(unrelated.image.url, content)
+        self.assertContains(response, f'href="{earlier.image.url}"')
+        self.assertContains(response, 'data-caption="Later &quot;quote&quot;"')
+        self.assertContains(response, 'data-gallery-index="0"')
+        self.assertContains(response, 'data-gallery-index="1"')
+
+    def test_single_photo_gallery_has_valid_shared_modal(self):
+        post = self.post(title="Single gallery", news_type="photo", body="")
+        photo = NewsPhoto.objects.create(news=post, image=image_upload("single.jpg"))
+        response = self.client.get(post.get_absolute_url())
+        self.assertContains(response, f'href="{photo.image.url}"')
+        self.assertContains(response, "data-news-lightbox")
+        self.assertContains(response, 'aria-label="Previous photo"')

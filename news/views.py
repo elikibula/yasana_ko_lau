@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
+from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -66,7 +67,21 @@ class NewsDetailView(PublishedNewsMixin, DetailView):
         related = self.get_queryset().exclude(pk=self.object.pk)
         if self.object.category:
             related = related.filter(category=self.object.category)
-        context["related_posts"] = related[:3]
+        share_url = self.request.build_absolute_uri(self.object.get_absolute_url())
+        first_photo = self.object.photos.first()
+        share_image = self.object.cover_image or (first_photo.image if first_photo else None)
+        if share_image:
+            share_image_url = self.request.build_absolute_uri(share_image.url)
+        else:
+            share_image_url = self.request.build_absolute_uri(static("images/logo_lau.png"))
+        context.update(
+            {
+                "related_posts": related[:3],
+                "post_share_url": share_url,
+                "post_share_title": self.object.title,
+                "post_share_image_url": share_image_url,
+            }
+        )
         return context
 
 
